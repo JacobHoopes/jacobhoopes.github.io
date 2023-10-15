@@ -37,7 +37,7 @@ var timeBreak = 1000; // time delay between waves of balls (in ms)
 var leftScore = 0;
 var rightScore = 0;
 
-var winningScore = 1000;
+var winningScore = 6;
 
 
 /* I wonder if it's possible to find the mouse position immediately upon page startup
