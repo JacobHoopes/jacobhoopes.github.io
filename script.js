@@ -15,10 +15,10 @@ function randomRGB() {
 } // why doesn't 'rgb(${random(0,255)},${random(0,255)},${random(0,255)})' work?
 
 // a bunch of variables to control the game
-const numBalls = 2000;
+const numBalls = 1;
 var ballSize = 7; // ball radius
 
-const trailLength = 0.3; // 0 = infinite trail, 1 = no trail
+const trailLength = 1; // 0 = infinite trail, 1 = no trail
 
 var paddleWidth = 14;
 var paddleLength = 80;
