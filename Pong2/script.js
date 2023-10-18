@@ -18,7 +18,7 @@ function randomRGB() {
 const numBalls = 10;
 var ballSize = 7; // ball radius
 
-const trailLength = 1; // 0 = infinite trail, 1 = no trail
+const trailLength = 0.7; // 0 = infinite trail, 1 = no trail
 
 var paddleWidth = 14;
 var paddleLength = 80;
@@ -54,11 +54,12 @@ function setInitialMouseY(event) {
 }
 */
 
-
+/* Not used
 function convertRGB(rgb) { // converts named colors like 'white' to rgb strings
     rgb = rgb.match(/^rgb\((\d+), \s*(\d+), \s*(\d+)\)$/);
     console.log(rgb[0], rgb[1], rgb[2]);
 }
+*/
 
 class Paddle {
     constructor(x,y,color) {
@@ -67,9 +68,11 @@ class Paddle {
         this.color = color;
         this.width = paddleWidth;
         this.length = paddleLength;
+        this.velocity = 0;
 
         window.addEventListener('mousemove', (event) => {
             let Y = event.clientY;
+            tempY = this.y;
             if (Y<this.length/2) {
                 this.y = 0;
             } else if (Y > height - this.length/2) {
@@ -77,6 +80,7 @@ class Paddle {
             } else {
                 this.y = Y - this.length/2;
             } 
+            this.velocity = this.y - tempY;
         });
     }
 
@@ -162,7 +166,7 @@ class Ball {
                     }
                     
                     if (dx <= dy) { // collision near the left or right
-                        if (this.x < ball.x) { // seems to work more evenly for ball. than this.
+                        if (this.x < ball.x) { // seems to work more evenly for "this.x < ball.x" than "ball.x < this.x"
                             this.velX = -(Math.abs(this.velX));
                             ball.velX = Math.abs(ball.velX);
                         } else {
@@ -184,16 +188,18 @@ class Ball {
             const dy = Math.abs((this.y+this.size) - (paddle.y + paddle.length/2));
 
             if ((dy < this.size + paddle.length/2) && (dx < this.size + paddle.width/2)) { // if a ball and a paddle touch
-                if (dy > paddle.length/2 - this.size) { // if a ball hits within a ball's width of the end of a paddle
-                    if (this.y + this.size < paddle.y + paddle.length/2) { // determining the side of the paddle the ball hit
+
+
+                if (dy > paddle.length/2 - this.size) { // if a ball hits one of the ends of a paddle
+                    if (this.y + this.size < paddle.y + paddle.length/2) { // determining which end of the paddle was hit
                         this.velY = -(Math.abs(this.velY));
                     } else {
                         this.velY = Math.abs(this.velY);
                     }
                 }
 
-                if (dx > paddle.width/2 - this.size) {
-                    if (this.x + this.size < paddle.x + paddle.width/2) {
+                if (dx > paddle.width/2 - this.size) { // if a ball hits one of the faces of a paddle
+                    if (this.x + this.size < paddle.x + paddle.width/2) { // determining which face of the paddle was hit
                         this.velX = -(Math.abs(this.velX));
                     } else {
                         this.velX = Math.abs(this.velX);
