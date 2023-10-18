@@ -1,8 +1,8 @@
 // setup canvas
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-const width = canvas.width = window.innerWidth;
-const height = canvas.height = window.innerHeight;
+var width = canvas.width = window.innerWidth;
+var height = canvas.height = window.innerHeight;
 
 // random number generator
 function random(min,max) {
@@ -72,7 +72,7 @@ class Paddle {
 
         window.addEventListener('mousemove', (event) => {
             let Y = event.clientY;
-            tempY = this.y;
+            let tempY = this.y;
             if (Y<this.length/2) {
                 this.y = 0;
             } else if (Y > height - this.length/2) {
@@ -313,7 +313,12 @@ function loop() {
         window.addEventListener('click', restartClick);
     }
     if (!GG) {
-        requestAnimationFrame(loop);
+        // width = window.innerWidth;
+        // height = window.innerHeight;
+
+        dashCount = Math.floor((height/2)/(2*ballSize));
+        startingSpacer = (height-(dashCount*2*ballSize)-((dashCount-1)*2*ballSize))/2;
+        requestAnimationFrame(loop)
     }
     
 }
