@@ -199,11 +199,25 @@ class Ball {
                 }
 
                 if (dx > paddle.width/2 - this.size) { // if a ball hits one of the faces of a paddle
-                    if (this.x + this.size < paddle.x + paddle.width/2) { // determining which face of the paddle was hit
-                        this.velX = -(Math.abs(this.velX));
-                    } else {
-                        this.velX = Math.abs(this.velX);
+                    let ylevel = this.y + this.size;
+
+                    if (paddle.x < width/2) { // the left paddle was hit
+                        let theta = Math.asin(ylevel);
+                        let phi = Math.atan(this.velY/this.velX);
+                        let velT = Math.sqrt(this.velY**2 + this.velX**2);
+                        let newAngle = 2*theta - phi;
+                        this.velY = velT*Math.cos(newAngle);
+                        this.velX = velT*Math.sin(newAngle);
+
+                    } else { // the right paddle was hit
+
                     }
+
+                    // if (this.x + this.size < paddle.x + paddle.width/2) { // determining which face of the paddle was hit
+                    //     this.velX = -(Math.abs(this.velX));
+                    // } else {
+                    //     this.velX = Math.abs(this.velX);
+                    // }
                 }
                 this.color = paddle.color;
             }
