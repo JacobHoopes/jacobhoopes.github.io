@@ -23,14 +23,15 @@ const trailLength = 0.7; // 0 = infinite trail, 1 = no trail
 var paddleWidth = 14;
 var paddleLength = 80;
 
-var ballMinIXVelocity = 6;
-var ballMaxIXVelocity = 7;
+var ballMinIXVelocity = 2; // Magnitude of the initial X velocity
+var ballMaxIXVelocity = 4;
 
-var ballMinIYVelocity = -4;
-var ballMaxIYVelocity = 4;
+var ballMinIYVelocity = -3;
+var ballMaxIYVelocity = 3;
 
-var ballMaxFXVelocity = 10;
-var ballMaxFYVelocity = 10;
+var ballMaxV = 10;
+
+var bounceSpeedup = 1.5;
 
 var timeBreak = 1000; // time delay between waves of balls (in ms)
 
@@ -61,26 +62,46 @@ function convertRGB(rgb) { // converts named colors like 'white' to rgb strings
 }
 */
 
+function drawLine(ctx, x1, y1, x2,y2, stroke = 'white', width = 3) {
+    // start a new path
+    ctx.beginPath();
+
+    // place the cursor from the point the line should be started 
+    ctx.moveTo(x1, y1);
+
+    // draw a line from current cursor position to the provided x,y coordinate
+    ctx.lineTo(x2, y2);
+
+    // set strokecolor
+    ctx.strokeStyle = stroke;
+
+    // set lineWidht 
+    ctx.lineWidth = width;
+
+    // add stroke to the line 
+    ctx.stroke();
+  }
+
 class Paddle {
-    constructor(x,y,color) {
+    constructor(x,y,color,reverse) {
         this.x = x;
         this.y = y;
         this.color = color;
         this.width = paddleWidth;
         this.length = paddleLength;
-        this.velocity = 0;
+        this.reverse = reverse;
 
         window.addEventListener('mousemove', (event) => {
             let Y = event.clientY;
-            let tempY = this.y;
-            if (Y<this.length/2) {
+            if ((Y < this.length/2 && !this.reverse) || (Y > height - this.length/2 && this.reverse))  {
                 this.y = 0;
-            } else if (Y > height - this.length/2) {
+            } else if ((Y > height - this.length/2 && !this.reverse) || (Y < this.length/2 && this.reverse)) {
                 this.y = height - this.length;
-            } else {
+            } else if (!this.reverse) {
                 this.y = Y - this.length/2;
-            } 
-            this.velocity = this.y - tempY;
+            } else {
+                this.y = height - (Y + this.length/2);
+            }
         });
     }
 
@@ -190,7 +211,7 @@ class Ball {
             if ((dy < this.size + paddle.length/2) && (dx < this.size + paddle.width/2)) { // if a ball and a paddle touch
 
 
-                if (dy > paddle.length/2 - this.size) { // if a ball hits one of the ends of a paddle
+                if (dy > paddle.length/2) { // if a ball hits one of the ends of a paddle
                     if (this.y + this.size < paddle.y + paddle.length/2) { // determining which end of the paddle was hit
                         this.velY = -(Math.abs(this.velY));
                     } else {
@@ -198,18 +219,48 @@ class Ball {
                     }
                 }
 
-                if (dx > paddle.width/2 - this.size) { // if a ball hits one of the faces of a paddle
-                    let ylevel = this.y + this.size;
+                else if (dx > paddle.width/2 - this.size) { // if a ball hits one of the faces of a paddle
+                    let ylevel = -Math.max(-1,Math.min(1,(paddle.y + paddle.length/2 - (this.y + this.size))/(paddle.length/2)));
 
-                    if (paddle.x < width/2) { // the left paddle was hit
-                        let theta = Math.asin(ylevel);
-                        let phi = Math.atan(this.velY/this.velX);
-                        let velT = Math.sqrt(this.velY**2 + this.velX**2);
-                        let newAngle = 2*theta - phi;
-                        this.velY = velT*Math.cos(newAngle);
-                        this.velX = velT*Math.sin(newAngle);
+                    if (paddle.x + paddle.width/2 < this.x + this.size) { // the right side of a paddle was hit
 
-                    } else { // the right paddle was hit
+                        let oldAngle = Math.atan(this.velY/this.velX); // the incoming angle of the ball
+                        let middleAngle = Math.asin(ylevel); // the angle that defines the plane off which the ball bounces
+                        let newAngle = Math.max(-0.8*Math.PI/2, Math.min(0.8*Math.PI/2,2*middleAngle - oldAngle)); // the outgoing angle of the ball
+                        let velT = Math.min(ballMaxV, bounceSpeedup*Math.sqrt(this.velY**2 + this.velX**2));
+                        
+                        this.x = paddle.x + paddle.width;
+                        this.velX = velT*Math.cos(newAngle);
+                        this.velY = velT*Math.sin(newAngle);
+                        
+                        // ctx.fillText('old: ' + oldAngle + '(' + this.velX + ', ' + this.velY + '), middle: ' + middleAngle + ', new: ' + newAngle, width/2 + 100, height/2 - 150);
+
+                        
+                        // GG = 1;
+                        // drawLine(ctx, paddlex, paddle.y + paddle.length/2, paddlex + 100, paddle.y + paddle.length/2, 'white'); // horizonal line at paddle middle
+                        // drawLine(ctx, paddlex, this.y+this.size, paddlex+50, this.y+this.size, 'white'); // horizontal line at contact point
+                        // drawLine(ctx, paddlex - 200*this.velX, paddley - 200*this.velY, paddlex, paddley, 'purple'); // actual old angle
+
+                        // ctx.fillText(this.velX + ' and ' + this.velY + ' makes ' + Math.sqrt(this.velX**2+this.velY**2), width/2 + 100, height/2 - 100);
+                        // drawLine(ctx, this.x+this.size, this.y+this.size, this.x+this.size+10*velT*Math.cos(-newAngle), this.y+this.size+10*velT*Math.sin(newAngle), 'orange');
+                        // ctx.fillText(this.velX + ' and ' + this.velY + ' makes ' + Math.sqrt(this.velX**2+this.velY**2), width/2 + 100, height/2 - 50);
+
+                    } else { // the right side of a paddle was hit
+                        let oldAngle = Math.PI + Math.atan(this.velY/this.velX); // the incoming angle of the ball
+                        let middleAngle = Math.PI - Math.asin(ylevel); // the angle that defines the plane off which the ball bounces
+                        let newAngle = Math.max(-0.8*Math.PI/2+Math.PI, Math.min(0.8*Math.PI/2+Math.PI,2*middleAngle - oldAngle)); // the outgoing angle of the ball
+                        let velT = Math.min(ballMaxV, bounceSpeedup*Math.sqrt(this.velY**2 + this.velX**2));
+
+
+                        // let paddlex = paddle.x;
+                        // let paddley = paddle.y + paddle.length/2 + ylevel*paddle.length/2;
+                        // drawLine(ctx, paddlex + 100*Math.cos(oldAngle), paddley + 100*Math.sin(oldAngle), paddlex, paddley, 'green'); // old angle
+                        // drawLine(ctx, paddlex + 100*Math.cos(middleAngle), paddley + 100*Math.sin(middleAngle), paddlex, paddley, 'blue'); // ylevel angle
+                        // drawLine(ctx, paddlex + 100*Math.cos(newAngle), paddley + 100*Math.sin(newAngle), paddlex, paddley, 'red'); // new angle
+                        
+                        this.x = paddle.x - 2*this.size;
+                        this.velX = velT*Math.cos(newAngle);
+                        this.velY = velT*Math.sin(newAngle);
 
                     }
 
@@ -230,14 +281,16 @@ const paddles = [];
 const paddle1 = new Paddle(
     50,
     height/2-paddleLength/2,
-    'blue'
+    'blue',
+    false
 )
 paddles.push(paddle1);
 
 const paddle2 = new Paddle(
     width-50-paddleWidth,
     height/2-paddleLength/2,
-    'red'
+    'red',
+    true
 )
 paddles.push(paddle2);
 
@@ -245,15 +298,15 @@ const balls = [];
 
 function spawnBalls() {
     while (balls.length < numBalls) {
-        let direction = -1;
+        let direction = -1.0;
         if (Math.random()<0.5) {
-            direction = 1;
+            direction = 1.0;
         }
         const ball = new Ball(
             width/2 - ballSize + (2*direction*ballSize),
-            random(0 + ballSize, height - 3*ballSize),
-            direction*random(ballMinIXVelocity,ballMaxIXVelocity),
-            random(ballMinIYVelocity,ballMaxIYVelocity),
+            random( + ballSize, height - 3*ballSize),
+            direction*(Math.random()*(ballMaxIXVelocity - ballMinIXVelocity) + ballMinIXVelocity),
+            Math.random()*(ballMaxIYVelocity - ballMinIYVelocity) + ballMinIYVelocity,
             'white'
         );
 

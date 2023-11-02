@@ -1,7 +1,11 @@
-.body {
+h1 {
+    color:red;
+}
+
+body {
     font-family: 'Cascadia Code', sans-serif;                                        
 }
-.p {
+p {
     font-family: 'Cascadia Code', sans-serif;
-    color: red;                                     
+    color: rgb(96, 66, 66);                                     
 }
