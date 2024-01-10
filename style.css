@@ -7,6 +7,37 @@ body {
     background-color: rgb(60, 102, 60);
     font-family: 'Cascadia Code', sans-serif;                                        
 }
-p {                
-                 
+
+p {color: red;
+    background-color: black;
+}
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: stretch;
+}
+
+.flex-item {
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #333;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+    .flex-item {
+        flex: 100%;
+    }
+}
+
+.fade-in-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-in {
+    opacity: 1;
 }
