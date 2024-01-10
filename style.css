@@ -1,11 +1,12 @@
+
 h1 {
-    color:red;
+    color:black;
 }
 
 body {
+    background-color: rgb(60, 102, 60);
     font-family: 'Cascadia Code', sans-serif;                                        
 }
-p {
-    font-family: 'Cascadia Code', sans-serif;
-    color: rgb(96, 66, 66);                                     
+p {                
+                 
 }
