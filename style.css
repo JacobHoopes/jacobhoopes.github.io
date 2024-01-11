@@ -13,7 +13,7 @@ body {
 }
 
 .element {
- color:brown;
+    color:brown;
 }
 
 .tooltip {
@@ -26,7 +26,7 @@ body {
 }
 
 .button:hover {
- background-color: grey;
+    background-color: grey;
 }
 
 .flex-container {
