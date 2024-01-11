@@ -8,9 +8,27 @@ body {
     font-family: 'Cascadia Code', sans-serif;                                        
 }
 
-p {color: red;
-    background-color: black;
+.container {
+    position: relative;
 }
+
+.element {
+ color:brown;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+}
+
+.element:hover {
+    color:black;
+}
+
+.button:hover {
+ background-color: grey;
+}
+
 .flex-container {
     display: flex;
     flex-wrap: wrap;
@@ -25,6 +43,11 @@ p {color: red;
     border: 1px solid #333;
     text-align: center;
     box-sizing: border-box;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.flex-item:hover {
+    background-color: rgba(128, 128, 128, 0.169);
 }
 
 @media (max-width: 500px) {
