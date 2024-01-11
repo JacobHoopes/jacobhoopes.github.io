@@ -4,8 +4,17 @@ h1 {
 }
 
 body {
-    background-color: rgb(60, 102, 60);
+    background-color: rgb(255, 255, 255);
     font-family: 'Cascadia Code', sans-serif;                                        
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    /* text-decoration: underline; */
 }
 
 .container {
@@ -25,8 +34,13 @@ body {
     color:black;
 }
 
+.button {
+    transition: background-color 0.3s ease-in-out;
+    border: 1px solid #333;
+}
+
 .button:hover {
-    background-color: grey;
+    background-color: rgba(128, 128, 128, 0.169);
 }
 
 .flex-container {
@@ -40,15 +54,10 @@ body {
     flex: 1;
     margin: 10px;
     padding: 20px;
-    border: 1px solid #333;
     text-align: center;
     box-sizing: border-box;
-    transition: background-color 0.3s ease-in-out;
 }
 
-.flex-item:hover {
-    background-color: rgba(128, 128, 128, 0.169);
-}
 
 @media (max-width: 500px) {
     .flex-item {
