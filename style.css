@@ -1,21 +1,27 @@
-
+html {
+    cursor: none;
+}
 h1 {
     color:black;
 }
 
 body {
     background-color: rgb(255, 255, 255);
-    font-family: 'Cascadia Code', sans-serif;                                        
+    font-family: 'Cascadia Code', sans-serif;     
+    margin: 0;
+    border: 0;   
+    text-align: center;                                
 }
+
 
 a {
     color: black;
     text-decoration: none;
 }
 
-a:hover {
-    /* text-decoration: underline; */
-}
+/* a:hover {
+    text-decoration: underline;
+} */
 
 .container {
     position: relative;
@@ -37,6 +43,7 @@ a:hover {
 .button {
     transition: background-color 0.3s ease-in-out;
     border: 1px solid #333;
+    cursor: none;
 }
 
 .button:hover {
@@ -72,4 +79,16 @@ a:hover {
 
 .fade-in {
     opacity: 1;
+}
+
+
+
+/*position relative as a base for non-static elements*/
+#outerDiv{
+    position:relative;
+}
+
+/*every direct child positioned absolute*/
+#outerDiv > div {
+    position:absolute;
 }
