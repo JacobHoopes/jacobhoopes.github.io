@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet"> -->
+ 
+    <title>House Search</title>
+    <meta name="author" content="Jacob Hoopes">
+    <style>
+        html {
+            overflow: hidden;
+        }
+        .mapParent {
+            position: relative;
+            display: grid;
+            /* place-items: center; */
+
+            justify-items: center;
+            width: 100%;
+            height: 50vh;
+            /* margin: 10px; */
+            /* border: 2px solid black; */
+            overflow: hidden;
+            border-radius: 30px;
+
+        }
+        .mapChild {
+            position: absolute;
+            border: none;
+            width: 100%;
+            height: 120%;
+            bottom: -20px;
+
+        }
+    </style>
+</head>
+<body>
+    <div class="mapParent">
+        <iframe class="mapChild" style="position:relative; top:-69px" src="https://www.google.com/maps/d/embed?mid=1p8UxQ3muglm1lsIM_ufND62EUiALq8c&ehbc=2E312F" width="100%" height="119%"></iframe>
+    </div>
+    <table style="width: 100%">
+        <tr>
+            <th>Address & Map Color</th>
+            <th>Rent</th>
+            <th>Beds / Baths</th>
+            <th>Sq Feet</th>
+        </tr>
+        <tr>
+            <th style="background-color: rgb(0,0,0); color: white">332 NE 76th Ave</th>
+            <th>$3100</th>
+            <th>4 / 2</th>
+            <th>2144</th>
+        </tr>
+        <tr>
+            <th style="background-color: rgb(0,136,209); color: white">3427 E Burnside St</th>
+            <th>$3250</th>
+            <th>4 / 1.5</th>
+            <th>2400</th>
+        </tr>
+        <tr>
+            <th style="background-color: rgb(194, 23, 91); color: white">1927 SE Washington St</th>
+            <th>$3550</th>
+            <th>4 / 2</th>
+            <th>2936</th>
+        </tr>
+        <tr>
+            <th style="background-color: rgb(249, 169, 37); color: white">2313 SE 52nd Ave</th>
+            <th>$3368</th>
+            <th>4 / 2</th>
+            <th>2600</th>
+        </tr>
+        <tr>
+            <th style="background-color: rgb(103, 58, 183); color: white;">4451 SE 29th Ave</th>
+            <th>$2995</th>
+            <th>5 / 3</th>
+            <th>1660</th>
+        </tr>
+    </table>
+</body>
+
+</html>
