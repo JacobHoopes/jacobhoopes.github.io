@@ -10,8 +10,11 @@
     <title>House Search</title>
     <meta name="author" content="Jacob Hoopes">
     <style>
-        html {
+        html, body  {
             overflow: hidden;
+            height: 100%;
+            margin: 0;
+            min-height: 100%;
         }
         .mapParent {
             position: relative;
@@ -19,9 +22,9 @@
             /* place-items: center; */
 
             justify-items: center;
-            width: 100%;
-            height: 50vh;
-            /* margin: 10px; */
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
+            margin: 10px;
             /* border: 2px solid black; */
             overflow: hidden;
             border-radius: 30px;
@@ -31,9 +34,16 @@
             position: absolute;
             border: none;
             width: 100%;
-            height: 120%;
+            height: 114%;
             bottom: -20px;
 
+        }
+        .infoTable {
+            width: 100%; 
+            padding: 25px; 
+            position: absolute; 
+            bottom: 0; 
+            background-color: rgba(255,255,255,0.65);
         }
     </style>
 </head>
@@ -41,7 +51,7 @@
     <div class="mapParent">
         <iframe class="mapChild" style="position:relative; top:-69px" src="https://www.google.com/maps/d/embed?mid=1p8UxQ3muglm1lsIM_ufND62EUiALq8c&ehbc=2E312F" width="100%" height="119%"></iframe>
     </div>
-    <table style="width: 100%">
+    <table class="infoTable">
         <tr>
             <th>Address & Map Color</th>
             <th>Rent</th>
