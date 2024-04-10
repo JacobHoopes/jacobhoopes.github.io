@@ -15,7 +15,7 @@ var moveSpeed = 4;
 var turnSpeed = 0.025;
 
 // settings for mobile
-var touchSensitivity = 0.002;
+var touchSensitivity = 0.004;
 var zoomSensitivity = 2;
 
 var previousTouch = [];
@@ -41,7 +41,7 @@ function setup() {
     // cam1.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
     // ortho();
     cam2 = createCamera();
-    cam2.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
+    cam2.perspective(PI/3, width / height, 5*sqrt(3), 500*sqrt(3));
     setCamera(cam2);
     currentCamera = 2;
 
@@ -132,7 +132,8 @@ function draw() {
         push()
         // translate(boxes[i][0]*1 +random(), boxes[i][1]*1 + random(), boxes[i][2]*1 + random());
         translate(boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40, boxes[i][1]*1 + sin(frameCount/200 - 59*i), boxes[i][2]*1 + sin(frameCount/46 - 100*i));
-        box(sin(frameCount/80 + 42*i) * 40)
+        let edge = sin(frameCount/80 + 42*i) * 40;
+        box(edge)
         pop();
     }
     if (touches.length === 0) {
@@ -170,13 +171,15 @@ function mouseDragged() {
     } else if (touches.length === 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
         if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) >= 2)) && viewState !== "moving") { // Control of Zoom 
-            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
-                camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
-            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in), equivalent to "w"
-                camZ -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.cos(camPan);
-                camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
-            }
+            camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
+            camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
+            // if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
+            //     camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
+            //     camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
+            // } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in), equivalent to "w"
+            //     camZ -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.cos(camPan);
+            //     camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
+            // }
             viewState = "zooming";
         } else if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 2)) && viewState !== "zooming") { // Control of Panning/Moving
             let newMidX = (touches[0].x + touches[1].x) / 2;
@@ -185,20 +188,6 @@ function mouseDragged() {
                 camX -= (newMidX - midX) * Math.cos(camPan);
                 camZ += (newMidX - midX) * Math.sin(camPan);
                 camY -= (newMidY - midY);
-                // if (newMidX > midX) { // equivalent to "a" (WORKING)
-                //     camX -= (newMidX - midX) * Math.cos(camPan);
-                //     camZ += (newMidX - midX) * Math.sin(camPan);
-                // } else if (newMidX < midX) { // equivalent to "d" (NOT WORKING)
-                //     camX += (midX - newMidX) * Math.cos(camPan);
-                //     camZ -= (midX - newMidX) * Math.sin(camPan);
-                // }
-                // // if (abs(midX - newMidX) > 10 ) {
-                // if (newMidY > midY) { // equivalent to SHIFT (NOT WORKING)
-                //     camY += (newMidY - midY);
-                // } else if (newMidY < midY) { // equivalent to SPACEBAR (WORKING)
-                //     camY -= (midY - newMidY);
-                // }
-                // // }
             }
             midX = newMidX;
             midY = newMidY;
