@@ -166,7 +166,7 @@ function mouseDragged() {
         previousTouch = touches[0];
     } else if (touches.length === 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) >= 4)) && viewState !== "moving") {
+        if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) >= 2)) && viewState !== "moving") { // Control of Zoom 
             if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
                 camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
                 camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
@@ -175,24 +175,24 @@ function mouseDragged() {
                 camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
             }
             viewState = "zooming";
-        } else if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 4)) && viewState !== "zooming") {
+        } else if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 2)) && viewState !== "zooming") { // Control of Panning/Moving
             let newMidX = (touches[0].x + touches[1].x) / 2;
             let newMidY = (touches[0].y + touches[1].y) / 2;
             if (midX !== "none" && midY !== "none") {
 
-                if (newMidX > midX) { // equivalent to "a"
+                if (newMidX > midX) { // equivalent to "a" (WORKING)
                     camX -= (newMidX - midX) * Math.cos(camPan);
                     camZ += (newMidX - midX) * Math.sin(camPan);
-                } else if (newMidX < midX) { // equivalent to "d"
-                    camX += (newMidX - midX) * Math.cos(camPan);
-                    camZ -= (newMidX - midX) * Math.sin(camPan);
+                } else if (newMidX < midX) { // equivalent to "d" (NOT WORKING)
+                    camX += (midX - newMidX) * Math.cos(camPan);
+                    camZ -= (midX - newMidX) * Math.sin(camPan);
                 }
                 // if (abs(midX - newMidX) > 10 ) {
-                    if (newMidY > midY) { // equivalent to SHIFT
-                        camY -= (newMidY - midY);
-                    } else if (newMidY < midY) { // equivalent to SPACEBAR
-                        camY += (newMidY - midY);
-                    }
+                if (newMidY > midY) { // equivalent to SHIFT (NOT WORKING)
+                    camY -= (midY - newMidY);
+                } else if (newMidY < midY) { // equivalent to SPACEBAR (WORKING)
+                    camY += (newMidY - midY);
+                }
                 // }
             }
             midX = newMidX;
