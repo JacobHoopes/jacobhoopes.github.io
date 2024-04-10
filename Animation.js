@@ -12,7 +12,7 @@ var camPan = 0;
 
 var moveSpeed = 4;
 var turnSpeed = 0.025;
-var touchSensitivity = 0.005;
+var touchSensitivity = 0.003;
 var zoomSensitivity = 1.5;
 
 var previousTouch = [];
@@ -170,7 +170,7 @@ function mouseDragged() {
                 camZ -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.cos(camPan);
                 camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
             }
-        } else if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 5)) {
+        } else if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 10)) {
             let newMidX = (touches[0].x + touches[1].x) / 2;
             let newMidY = (touches[0].y + touches[1].y) / 2;
             if (midX !== "none" && midY !== "none") {
@@ -182,13 +182,13 @@ function mouseDragged() {
                     camX += touchSensitivity * (newMidX - midX) * Math.cos(camPan);
                     camZ -= touchSensitivity * (newMidX - midX) * Math.sin(camPan);
                 }
-                if (abs(midX - newMidX) > 10 ) {
+                // if (abs(midX - newMidX) > 10 ) {
                     if (newMidY > midY) { // equivalent to SHIFT
                         camY -= touchSensitivity * (newMidY - midY);
                     } else if (newMidY < midY) { // equivalent to SPACEBAR
                         camY += touchSensitivity * (newMidY - midY);
                     }
-                }
+                // }
             }
 
             midX = newMidX;
