@@ -163,28 +163,28 @@ function draw() {
     box(10);
     for (let i = 0; i < boxes.length; i ++) {
         push()
-        translate(boxes[i][0]*1 +random(), boxes[i][1]*1 + random(), boxes[i][2]*1 + random());
+        // translate(boxes[i][0]*1 +random(), boxes[i][1]*1 + random(), boxes[i][2]*1 + random());
+        translate(boxes[i][0], boxes[i][1], boxes[i][2]);
         box(10)
         pop();
-        
     }
 }
 
 
 function mouseDragged() {
     if (touches.length === 2) {
-        // let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        // if (pinchDistance != 0) {
-        //     if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
-        //         camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
-        //         camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
-        //     } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
-        //         camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
-        //         camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
-        //     }
-        // }
-        // pinchDistance = newPinchDistance;
-    } else if (touches.length <= 1) {
+        let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
+        if (pinchDistance != 0) {
+            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
+                camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
+                camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
+            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
+                camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
+                camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
+            }
+        }
+        pinchDistance = newPinchDistance;
+    } else if (touches.length === 0) {
         requestPointerLock();
         camPan -= movedX * mouseSensitivity;
         camTilt += movedY * mouseSensitivity;
