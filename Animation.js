@@ -1,7 +1,7 @@
 
-var Yangle = 0;
-var Xangle = 0;
-var maxYangle = Math.PI / 4;
+// var Yangle = 0;
+// var Xangle = 0;
+// var maxYangle = Math.PI / 4;
 
 var camX = 0;
 var camY = 0;
@@ -16,7 +16,8 @@ var mouseSensitivity = 0.002;
 
 var previousTouch = [];
 var pinchDistance = 0;
-
+let midX = "none";
+let midY = "none";
 
 let cam1;
 let cam2;
@@ -28,11 +29,11 @@ let boxes = [];
 function setup() {
     var canvas = createCanvas(windowWidth, windowHeight, WEBGL);
     canvas.parent("outerDiv");
-    normalMaterial();
+    // normalMaterial();
     // userSelectDefault = document.body.style.userSelect;
-    cam1 = createCamera();
+    // cam1 = createCamera();
     // cam1.camera(0.1, 200, 0, 0, 0, 0, 0, 1, 0);
-    cam1.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
+    // cam1.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
     // ortho();
     cam2 = createCamera();
     cam2.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
@@ -51,7 +52,7 @@ function draw() {
     let dy = height / 2 - mouseY;
     let v = createVector(dx, dy, -100);
     let C = createVector(width / 2 - camX, height / 2 - camY, camZ)
-    cam1.camera(0, 0, 200+sin(frameCount * 0.01) * 30, 0, 0, 0, 0, 1, 0);
+    // cam1.camera(0, 0, 200+sin(frameCount * 0.01) * 30, 0, 0, 0, 0, 1, 0);
     cam2.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
     // cam2.camera(0, 0, 50*sqrt, camX, camY, camZ, 0, 1, 0);
     C.div(200);
@@ -63,51 +64,7 @@ function draw() {
     // background(170);
 
     // orbitControl()
-    if (currentCamera === 1) {
-        if (keyIsDown(188)) {
-            // Xangle += 0.01;
-        }
-        if (keyIsDown(190)) {
-            // Xangle -= 0.01;
-        }
-        if (keyIsDown(UP_ARROW)) {
-            Yangle += 0.02;
-            if (Yangle >= maxYangle) {
-                Yangle = maxYangle;
-            }
-        }
-        if (keyIsDown(DOWN_ARROW)) {
-            Yangle -= 0.02;
-            if (Yangle <= -maxYangle) {
-                Yangle = -maxYangle;
-            }
-        }
-        if (keyIsDown(LEFT_ARROW)) {
-            Xangle -= 0.02;
-        }
-        if (keyIsDown(RIGHT_ARROW)) {
-            Xangle += 0.02;
-        }
-        if (keyIsDown(87)) { // w
-            Xangle += 0.02;
-        }
-        if (keyIsDown(65)) { // a
-            Xangle += 0.02;
-        }
-        if (keyIsDown(83)) { // s
-            Xangle += 0.02;
-        }
-        if (keyIsDown(68)) { // d
-            Xangle += 0.02;
-        }
-
-        // ambientMaterial(255,255,255);
-        noStroke();
-        strokeWidth(10);
-
-        rotateZ(Yangle);
-        rotateX(Xangle);
-    } else if (currentCamera === 2) {
+    if (currentCamera === 2) {
         if (keyIsDown(188)) {
             // Xangle += 0.01;
         }
@@ -164,7 +121,7 @@ function draw() {
     }
     ambientMaterial(231,4,255);
     translate(0, 0, 0);
-    box(600);
+    // box(600);
     // box(10);
     for (let i = 0; i < boxes.length; i ++) {
         push()
@@ -173,7 +130,7 @@ function draw() {
         box(sin(frameCount/80 + 42*i) * 40)
         pop();
     }
-    if (touches.length === 0) {
+    if (touches.length != 0) {
         previousTouch = [];
         pinchDistance = 0;
     }
@@ -191,7 +148,7 @@ function mouseDragged() {
             camTilt = maxCamTilt;
         }
     } else if (touches.length === 1) { // dragged with one finger on mobile
-        if (previousTouch.length != 0) {
+        if (previousTouch.length !== 0) {
             camPan -= (touches[0].x - previousTouch.x) * mouseSensitivity;
             camTilt += (touches[0].y - previousTouch.y) * mouseSensitivity;
             if (camTilt <= -maxCamTilt) {
@@ -203,16 +160,35 @@ function mouseDragged() {
         previousTouch = touches[0];
     } else if (touches.length === 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if (pinchDistance != 0) {
-            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
+        if (pinchDistance !== 0) {
+            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
                 camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
                 camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
-            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
+            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in), equivalent to "w"
                 camZ -= (newPinchDistance - pinchDistance) * Math.cos(camPan);
                 camX -= (newPinchDistance - pinchDistance) * Math.sin(camPan);
             }
         }
         pinchDistance = newPinchDistance;
+
+        let newMidX = (touches[0].x + touches[1].x) / 2;
+        let newMidY = (touches[0].y + touches[1].y) / 2;
+        if (midX !== "none" && midY !== "none") {
+            if (newMidX > midX) { // equivalent to "a"
+                camX -= moveSpeed * Math.cos(camPan);
+                camZ += moveSpeed * Math.sin(camPan);
+            } else if (newMidX < midX) { // equivalent to "d"
+                camX += moveSpeed * Math.cos(camPan);
+                camZ -= moveSpeed * Math.sin(camPan);
+            }
+            if (newMidY > midY) { // equivalent to SHIFT
+                camY += moveSpeed;
+            } else if (newMidY < midY) { // equivalent to SPACEBAR
+                camY -= moveSpeed;
+            }
+        }
+        midX = newMidX;
+        midY = newMidY;
     }
 }
 
@@ -220,6 +196,8 @@ function mouseReleased() {
     exitPointerLock();
     previousTouch = [];
     pinchDistance = 0;
+    midX = "none";
+    midY = "none";
 }
 
 function doubleClicked() {
