@@ -21,6 +21,8 @@ let cam2;
 
 let currentCamera;
 
+let boxes = [];
+
 function setup() {
     var canvas = createCanvas(windowWidth, windowHeight, WEBGL);
     canvas.parent("outerDiv");
@@ -34,6 +36,10 @@ function setup() {
     cam2.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
     setCamera(cam2);
     currentCamera = 2;
+
+    for (let i = 0; i <= 20; i++) {
+        boxes[i] = [[random()*400-200], [random()*400-200], [random()*400-200]];
+    }
 }
 
 function draw() {
@@ -91,7 +97,8 @@ function draw() {
         }
 
         // ambientMaterial(255,255,255);
-        stroke(0);
+        noStroke();
+        strokeWidth(10);
 
         rotateZ(Yangle);
         rotateX(Xangle);
@@ -146,6 +153,7 @@ function draw() {
 
         // ambientMaterial(255,255,255);
         stroke(0);
+        strokeWeight(10);
         cam2.pan(camPan);
         cam2.tilt(camTilt);
     }
@@ -153,6 +161,13 @@ function draw() {
     translate(0, 0, 0);
     box(600);
     box(10);
+    for (let i = 0; i < boxes.length; i ++) {
+        push()
+        translate(boxes[i][0], boxes[i][1], boxes[i][2]);
+        box(10)
+        pop();
+        
+    }
 }
 
 
@@ -160,16 +175,16 @@ function mouseDragged() {
     if (touches.length === 2) {
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
         if (pinchDistance != 0) {
-            if (pinchDistance > newPinchDistance) { // dragging fingers closer together
-                camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
-            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart
+            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
                 camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
                 camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
+            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
+                camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
+                camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
             }
         }
         pinchDistance = newPinchDistance;
-    } else if (touches.length >= 0) {
+    } else if (touches.length <= 1) {
         requestPointerLock();
         camPan -= movedX * mouseSensitivity;
         camTilt += movedY * mouseSensitivity;
