@@ -166,7 +166,7 @@ function mouseDragged() {
         previousTouch = touches[0];
     } else if (touches.length === 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if (((pinchDistance !== 0)) && viewState !== "moving") {
+        if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) >= 4)) && viewState !== "moving") {
             if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
                 camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
                 camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
@@ -175,7 +175,7 @@ function mouseDragged() {
                 camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
             }
             viewState = "zooming";
-        } else if (((pinchDistance !== 0)) && viewState !== "zooming") {
+        } else if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 4)) && viewState !== "zooming") {
             let newMidX = (touches[0].x + touches[1].x) / 2;
             let newMidY = (touches[0].y + touches[1].y) / 2;
             if (midX !== "none" && midY !== "none") {
