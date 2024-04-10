@@ -173,6 +173,10 @@ function draw() {
         box(sin(frameCount/80 + 42*i) * 40)
         pop();
     }
+    if (touches.length === 0) {
+        previousTouch = [];
+        pinchDistance = 0;
+    }
 }
 
 
