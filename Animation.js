@@ -173,17 +173,17 @@ function draw() {
 
 function mouseDragged() {
     if (touches.length === 2) {
-        let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if (pinchDistance != 0) {
-            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
-                camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
-            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
-                camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
-            }
-        }
-        pinchDistance = newPinchDistance;
+        // let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
+        // if (pinchDistance != 0) {
+        //     if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
+        //         camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
+        //         camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
+        //     } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
+        //         camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
+        //         camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
+        //     }
+        // }
+        // pinchDistance = newPinchDistance;
     } else if (touches.length <= 1) {
         requestPointerLock();
         camPan -= movedX * mouseSensitivity;
