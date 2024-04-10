@@ -12,8 +12,8 @@ var camPan = 0;
 
 var moveSpeed = 4;
 var turnSpeed = 0.025;
-var touchSensitivity = 0.007;
-var zoomSensitivity = 3;
+var touchSensitivity = 0.005;
+var zoomSensitivity = 1.5;
 
 var previousTouch = [];
 var pinchDistance = 0;
@@ -174,17 +174,20 @@ function mouseDragged() {
             let newMidX = (touches[0].x + touches[1].x) / 2;
             let newMidY = (touches[0].y + touches[1].y) / 2;
             if (midX !== "none" && midY !== "none") {
+
                 if (newMidX > midX) { // equivalent to "a"
-                    camX -= moveSpeed * Math.cos(camPan);
-                    camZ += moveSpeed * Math.sin(camPan);
+                    camX -= touchSensitivity * (newMidX - midX) * Math.cos(camPan);
+                    camZ += touchSensitivity * (newMidX - midX) * Math.sin(camPan);
                 } else if (newMidX < midX) { // equivalent to "d"
-                    camX += moveSpeed * Math.cos(camPan);
-                    camZ -= moveSpeed * Math.sin(camPan);
+                    camX += touchSensitivity * (newMidX - midX) * Math.cos(camPan);
+                    camZ -= touchSensitivity * (newMidX - midX) * Math.sin(camPan);
                 }
-                if (newMidY > midY) { // equivalent to SHIFT
-                    camY += moveSpeed;
-                } else if (newMidY < midY) { // equivalent to SPACEBAR
-                    camY -= moveSpeed;
+                if (abs(midX - newMidX) > 10 ) {
+                    if (newMidY > midY) { // equivalent to SHIFT
+                        camY -= touchSensitivity * (newMidY - midY);
+                    } else if (newMidY < midY) { // equivalent to SPACEBAR
+                        camY += touchSensitivity * (newMidY - midY);
+                    }
                 }
             }
 
