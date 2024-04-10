@@ -12,7 +12,8 @@ var camPan = 0;
 
 var moveSpeed = 4;
 var turnSpeed = 0.025;
-var mouseSensitivity = 0.002;
+var touchSensitivity = 0.007;
+var zoomSensitivity = 3;
 
 var previousTouch = [];
 var pinchDistance = 0;
@@ -130,8 +131,9 @@ function draw() {
         box(sin(frameCount/80 + 42*i) * 40)
         pop();
     }
-    if (touches.length != 0) {
+    if (touches.length === 0) {
         previousTouch = [];
+        newPinchDistance = 0;
         pinchDistance = 0;
     }
 }
@@ -140,8 +142,8 @@ function draw() {
 function mouseDragged() {
     if (touches.length === 0) { // mouse used on desktop
         requestPointerLock();
-        camPan -= movedX * mouseSensitivity;
-        camTilt += movedY * mouseSensitivity;
+        camPan -= movedX * touchSensitivity;
+        camTilt += movedY * touchSensitivity;
         if (camTilt <= -maxCamTilt) {
             camTilt = -maxCamTilt;
         } else if (camTilt >= maxCamTilt) {
@@ -149,8 +151,8 @@ function mouseDragged() {
         }
     } else if (touches.length === 1) { // dragged with one finger on mobile
         if (previousTouch.length !== 0) {
-            camPan += (touches[0].x - previousTouch.x) * mouseSensitivity;
-            camTilt -= (touches[0].y - previousTouch.y) * mouseSensitivity;
+            camPan += (touches[0].x - previousTouch.x) * touchSensitivity;
+            camTilt -= (touches[0].y - previousTouch.y) * touchSensitivity;
             if (camTilt <= -maxCamTilt) {
                 camTilt = -maxCamTilt;
             } else if (camTilt >= maxCamTilt) {
@@ -160,35 +162,39 @@ function mouseDragged() {
         previousTouch = touches[0];
     } else if (touches.length === 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) > 10)) {
+        if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) > 7)) {
             if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
-                camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
+                camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
+                camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
             } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in), equivalent to "w"
-                camZ -= (newPinchDistance - pinchDistance) * Math.cos(camPan);
-                camX -= (newPinchDistance - pinchDistance) * Math.sin(camPan);
+                camZ -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.cos(camPan);
+                camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
             }
+        } else if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 5)) {
+            let newMidX = (touches[0].x + touches[1].x) / 2;
+            let newMidY = (touches[0].y + touches[1].y) / 2;
+            if (midX !== "none" && midY !== "none") {
+                if (newMidX > midX) { // equivalent to "a"
+                    camX -= moveSpeed * Math.cos(camPan);
+                    camZ += moveSpeed * Math.sin(camPan);
+                } else if (newMidX < midX) { // equivalent to "d"
+                    camX += moveSpeed * Math.cos(camPan);
+                    camZ -= moveSpeed * Math.sin(camPan);
+                }
+                if (newMidY > midY) { // equivalent to SHIFT
+                    camY += moveSpeed;
+                } else if (newMidY < midY) { // equivalent to SPACEBAR
+                    camY -= moveSpeed;
+                }
+            }
+
+            midX = newMidX;
+            midY = newMidY;
         }
+
+
         pinchDistance = newPinchDistance;
 
-        // let newMidX = (touches[0].x + touches[1].x) / 2;
-        // let newMidY = (touches[0].y + touches[1].y) / 2;
-        // if (midX !== "none" && midY !== "none") {
-        //     if (newMidX > midX) { // equivalent to "a"
-        //         camX -= moveSpeed * Math.cos(camPan);
-        //         camZ += moveSpeed * Math.sin(camPan);
-        //     } else if (newMidX < midX) { // equivalent to "d"
-        //         camX += moveSpeed * Math.cos(camPan);
-        //         camZ -= moveSpeed * Math.sin(camPan);
-        //     }
-        //     if (newMidY > midY) { // equivalent to SHIFT
-        //         camY += moveSpeed;
-        //     } else if (newMidY < midY) { // equivalent to SPACEBAR
-        //         camY -= moveSpeed;
-        //     }
-        // }
-        // midX = newMidX;
-        // midY = newMidY;
     }
 }
 
