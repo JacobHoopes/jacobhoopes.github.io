@@ -176,17 +176,17 @@ function mouseDragged() {
             if (midX !== "none" && midY !== "none") {
 
                 if (newMidX > midX) { // equivalent to "a"
-                    camX -= touchSensitivity * (newMidX - midX) * Math.cos(camPan);
-                    camZ += touchSensitivity * (newMidX - midX) * Math.sin(camPan);
+                    camX -= (newMidX - midX) * Math.cos(camPan);
+                    camZ += (newMidX - midX) * Math.sin(camPan);
                 } else if (newMidX < midX) { // equivalent to "d"
-                    camX += touchSensitivity * (newMidX - midX) * Math.cos(camPan);
-                    camZ -= touchSensitivity * (newMidX - midX) * Math.sin(camPan);
+                    camX += (newMidX - midX) * Math.cos(camPan);
+                    camZ -= (newMidX - midX) * Math.sin(camPan);
                 }
                 // if (abs(midX - newMidX) > 10 ) {
                     if (newMidY > midY) { // equivalent to SHIFT
-                        camY -= touchSensitivity * (newMidY - midY);
+                        camY -= (newMidY - midY);
                     } else if (newMidY < midY) { // equivalent to SPACEBAR
-                        camY += touchSensitivity * (newMidY - midY);
+                        camY += (newMidY - midY);
                     }
                 // }
             }
