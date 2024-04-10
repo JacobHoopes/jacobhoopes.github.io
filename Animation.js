@@ -179,21 +179,23 @@ function mouseDragged() {
             let newMidX = (touches[0].x + touches[1].x) / 2;
             let newMidY = (touches[0].y + touches[1].y) / 2;
             if (midX !== "none" && midY !== "none") {
-
-                if (newMidX > midX) { // equivalent to "a" (WORKING)
-                    camX -= (newMidX - midX) * Math.cos(camPan);
-                    camZ += (newMidX - midX) * Math.sin(camPan);
-                } else if (newMidX < midX) { // equivalent to "d" (NOT WORKING)
-                    camX += (midX - newMidX) * Math.cos(camPan);
-                    camZ -= (midX - newMidX) * Math.sin(camPan);
-                }
-                // if (abs(midX - newMidX) > 10 ) {
-                if (newMidY > midY) { // equivalent to SHIFT (NOT WORKING)
-                    camY -= (midY - newMidY);
-                } else if (newMidY < midY) { // equivalent to SPACEBAR (WORKING)
-                    camY += (newMidY - midY);
-                }
+                camX -= (newMidX - midX) * Math.cos(camPan);
+                camZ += (newMidX - midX) * Math.sin(camPan);
+                camY += (newMidY - midY);
+                // if (newMidX > midX) { // equivalent to "a" (WORKING)
+                //     camX -= (newMidX - midX) * Math.cos(camPan);
+                //     camZ += (newMidX - midX) * Math.sin(camPan);
+                // } else if (newMidX < midX) { // equivalent to "d" (NOT WORKING)
+                //     camX += (midX - newMidX) * Math.cos(camPan);
+                //     camZ -= (midX - newMidX) * Math.sin(camPan);
                 // }
+                // // if (abs(midX - newMidX) > 10 ) {
+                // if (newMidY > midY) { // equivalent to SHIFT (NOT WORKING)
+                //     camY += (newMidY - midY);
+                // } else if (newMidY < midY) { // equivalent to SPACEBAR (WORKING)
+                //     camY -= (midY - newMidY);
+                // }
+                // // }
             }
             midX = newMidX;
             midY = newMidY;
