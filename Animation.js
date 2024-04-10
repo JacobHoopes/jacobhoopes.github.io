@@ -12,13 +12,14 @@ var camPan = 0;
 
 var moveSpeed = 4;
 var turnSpeed = 0.025;
-var touchSensitivity = 0.003;
+var touchSensitivity = 0.0015;
 var zoomSensitivity = 1.5;
 
 var previousTouch = [];
 var pinchDistance = 0;
 let midX = "none";
 let midY = "none";
+let viewState = "none";
 
 let cam1;
 let cam2;
@@ -135,6 +136,8 @@ function draw() {
         previousTouch = [];
         newPinchDistance = 0;
         pinchDistance = 0;
+        midX = "none";
+        midY = "none";
     }
 }
 
@@ -162,7 +165,7 @@ function mouseDragged() {
         previousTouch = touches[0];
     } else if (touches.length === 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) > 7)) {
+        if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) > 7)) && viewState !== "moving") {
             if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out), equivalent to "s"
                 camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
                 camX += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.sin(camPan);
@@ -170,7 +173,8 @@ function mouseDragged() {
                 camZ -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.cos(camPan);
                 camX -= zoomSensitivity*(newPinchDistance - pinchDistance) * Math.sin(camPan);
             }
-        } else if ((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 10)) {
+            viewState = "zooming";
+        } else if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) < 10)) && viewState !== "zooming") {
             let newMidX = (touches[0].x + touches[1].x) / 2;
             let newMidY = (touches[0].y + touches[1].y) / 2;
             if (midX !== "none" && midY !== "none") {
@@ -190,23 +194,20 @@ function mouseDragged() {
                     }
                 // }
             }
-
             midX = newMidX;
             midY = newMidY;
+            viewState = "moving";
         }
-
-
         pinchDistance = newPinchDistance;
-
     }
 }
 
 function mouseReleased() {
     exitPointerLock();
-    previousTouch = [];
-    pinchDistance = 0;
-    midX = "none";
-    midY = "none";
+    // previousTouch = [];
+    // pinchDistance = 0;
+    // midX = "none";
+    // midY = "none";
 }
 
 function doubleClicked() {
