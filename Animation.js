@@ -163,7 +163,7 @@ function draw() {
     box(10);
     for (let i = 0; i < boxes.length; i ++) {
         push()
-        translate(boxes[i][0], boxes[i][1], boxes[i][2]);
+        translate(boxes[i][0]*1 +random(), boxes[i][1]*1 + random(), boxes[i][2]*1 + random());
         box(10)
         pop();
         
