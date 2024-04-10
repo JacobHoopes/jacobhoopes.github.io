@@ -10,9 +10,12 @@ var camTilt = 0;
 var maxCamTilt = Math.PI / 2.001;
 var camPan = 0;
 
+// settings for pc
 var moveSpeed = 4;
 var turnSpeed = 0.025;
-var touchSensitivity = 0.0015;
+
+// settings for mobile
+var touchSensitivity = 0.002;
 var zoomSensitivity = 2;
 
 var previousTouch = [];
@@ -181,7 +184,7 @@ function mouseDragged() {
             if (midX !== "none" && midY !== "none") {
                 camX -= (newMidX - midX) * Math.cos(camPan);
                 camZ += (newMidX - midX) * Math.sin(camPan);
-                camY += (newMidY - midY);
+                camY -= (newMidY - midY);
                 // if (newMidX > midX) { // equivalent to "a" (WORKING)
                 //     camX -= (newMidX - midX) * Math.cos(camPan);
                 //     camZ += (newMidX - midX) * Math.sin(camPan);
