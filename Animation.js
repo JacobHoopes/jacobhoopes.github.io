@@ -14,7 +14,9 @@ var moveSpeed = 4;
 var turnSpeed = 0.025;
 var mouseSensitivity = 0.002;
 
+var previousTouch = [];
 var pinchDistance = 0;
+
 
 let cam1;
 let cam2;
@@ -43,19 +45,22 @@ function setup() {
 }
 
 function draw() {
-    lights()
+    // lights()
+    background(255);
     let dx = width / 2 - mouseX;
     let dy = height / 2 - mouseY;
     let v = createVector(dx, dy, -100);
+    let C = createVector(width / 2 - camX, height / 2 - camY, camZ)
     cam1.camera(0, 0, 200+sin(frameCount * 0.01) * 30, 0, 0, 0, 0, 1, 0);
     cam2.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
     // cam2.camera(0, 0, 50*sqrt, camX, camY, camZ, 0, 1, 0);
-    v.div(100);
+    C.div(200);
+    // C = C*200;
     // v.normalize();
-    directionalLight(255,255,0, v)
-    ambientLight(100);
+    directionalLight(255,255,255, C)
+    ambientLight(200);
 
-    background(170);
+    // background(170);
 
     // orbitControl()
     if (currentCamera === 1) {
@@ -160,31 +165,19 @@ function draw() {
     ambientMaterial(231,4,255);
     translate(0, 0, 0);
     box(600);
-    box(10);
+    // box(10);
     for (let i = 0; i < boxes.length; i ++) {
         push()
         // translate(boxes[i][0]*1 +random(), boxes[i][1]*1 + random(), boxes[i][2]*1 + random());
-        translate(boxes[i][0], boxes[i][1], boxes[i][2]);
-        box(10)
+        translate(boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40, boxes[i][1]*1 + sin(frameCount/200 - 59*i), boxes[i][2]*1 + sin(frameCount/46 - 100*i));
+        box(sin(frameCount/80 + 42*i) * 40)
         pop();
     }
 }
 
 
 function mouseDragged() {
-    if (touches.length === 2) {
-        let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
-        if (pinchDistance != 0) {
-            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
-                camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
-            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
-                camZ -= (pinchDistance - newPinchDistance) * Math.cos(camPan);
-                camX -= (pinchDistance - newPinchDistance) * Math.sin(camPan);
-            }
-        }
-        pinchDistance = newPinchDistance;
-    } else if (touches.length === 0) {
+    if (touches.length === 0) { // mouse used on desktop
         requestPointerLock();
         camPan -= movedX * mouseSensitivity;
         camTilt += movedY * mouseSensitivity;
@@ -193,11 +186,35 @@ function mouseDragged() {
         } else if (camTilt >= maxCamTilt) {
             camTilt = maxCamTilt;
         }
+    } else if (touches.length === 1) { // dragged with one finger on mobile
+        if (previousTouch.length != 0) {
+            camPan -= (touches[0].x - previousTouch.x) * mouseSensitivity;
+            camTilt += (touches[0].y - previousTouch.y) * mouseSensitivity;
+            if (camTilt <= -maxCamTilt) {
+                camTilt = -maxCamTilt;
+            } else if (camTilt >= maxCamTilt) {
+                camTilt = maxCamTilt;
+            }
+        }
+        previousTouch = touches[0];
+    } else if (touches.length === 2) { // dragged with two fingers on mobile
+        let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
+        if (pinchDistance != 0) {
+            if (pinchDistance > newPinchDistance) { // dragging fingers closer together (zooming out)
+                camZ += (pinchDistance - newPinchDistance) * Math.cos(camPan);
+                camX += (pinchDistance - newPinchDistance) * Math.sin(camPan);
+            } else if (pinchDistance < newPinchDistance) { // dragging fingers further apart (zooming in)
+                camZ -= (newPinchDistance - pinchDistance) * Math.cos(camPan);
+                camX -= (newPinchDistance - pinchDistance) * Math.sin(camPan);
+            }
+        }
+        pinchDistance = newPinchDistance;
     }
 }
 
 function mouseReleased() {
     exitPointerLock();
+    previousTouch = [];
     pinchDistance = 0;
 }
 
