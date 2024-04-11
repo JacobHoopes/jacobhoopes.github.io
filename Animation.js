@@ -39,7 +39,7 @@ function setup() {
     // cam1 = createCamera();
     // cam1.camera(0.1, 200, 0, 0, 0, 0, 0, 1, 0);
     // cam1.perspective(PI/3, 1, 5*sqrt(3), 500*sqrt(3));
-    // ortho();
+    ortho();
     cam2 = createCamera();
     cam2.perspective(PI/3, width / height, 5*sqrt(3), 500*sqrt(3));
     setCamera(cam2);
@@ -52,7 +52,7 @@ function setup() {
 
 function draw() {
     // lights()
-    background(255);
+    background(0);
     let dx = width / 2 - mouseX;
     let dy = height / 2 - mouseY;
     let v = createVector(dx, dy, -100);
@@ -66,9 +66,6 @@ function draw() {
     directionalLight(255,255,255, C)
     ambientLight(200);
 
-    // background(170);
-
-    // orbitControl()
     if (currentCamera === 2) {
         if (keyIsDown(188)) {
             // Xangle += 0.01;
@@ -126,7 +123,7 @@ function draw() {
     }
     ambientMaterial(231,4,255);
     translate(0, 0, 0);
-    // box(600);
+    box(600);
     // box(10);
     for (let i = 0; i < boxes.length; i ++) {
         push()
@@ -143,6 +140,25 @@ function draw() {
         midX = "none";
         midY = "none";
         viewState = "none";
+    }
+
+    if (camX > 290) {
+        camX = 290;
+    }
+    if (camX < -290) {
+        camX = -290;
+    }
+    if (camY > 290) {
+        camY = 290;
+    }
+    if (camY < -290) {
+        camY = -290;
+    }
+    if (camZ > 290) {
+        camZ = 290;
+    }
+    if (camZ < -290) {
+        camZ = -290;
     }
 }
 
