@@ -4,7 +4,7 @@
 // var maxYangle = Math.PI / 4;
 
 var camX = 0;
-var camY = 0;
+var camY = 50;
 var camZ = 200;
 var camTilt = 0;
 var maxCamTilt = Math.PI / 2.001;
@@ -12,7 +12,7 @@ var camPan = 0;
 
 // settings for pc
 var moveSpeed = 4;
-var turnSpeed = 0.025;
+var turnSpeed = 0.03;
 
 // settings for mobile
 var touchSensitivity = 0.004;
@@ -32,11 +32,13 @@ let currentCamera;
 let boxes = [];
 let edge;
 
+let room;
+let currentDims;
 
-let g1Dims = [300,150,600]; // Gallery 1 Dimensions
+let g1Dims = [300,150,1200]; // Gallery 1 Dimensions
 let wallOffset = 10; // The minimum distance from the camera to any wall
 
-let initialJumpVelocity = 5; // initial jump velocity
+let initialJumpVelocity = 6; // initial jump velocity
 let jumpVelocity = 0; // How many pixels the camera should move vertically while in the air each time step
 let gravity = -0.4; // Number of pixels the jumpVelocity changes by each time step
 let standHeight = 50;
@@ -44,9 +46,13 @@ let standHeight = 50;
 let shapes;
 
 let img;
+let dome;
+let dome2;
 
 function preload() {
     img = loadImage('./Franky.jpg');
+    dome = loadModel('./Fancy\ Dome.obj');
+    dome2 = loadModel('./Dome2.obj');
 }
 
 function setup() {
@@ -60,24 +66,36 @@ function setup() {
     for (let i = 0; i < 20; i++) {
         boxes[i] = [[random()*400-200], [random()*400-200], [random()*400-200]];
     }
+
+    currentDims = g1Dims;
     makeGallery();
 }
 
 function draw() {
-    // lights()
     background(255);
-    // Image(img, 0, 0,0);
     texture(img);
     let dx = width / 2 - mouseX;
     let dy = height / 2 - mouseY;
     let v = createVector(dx, dy, -100);
     let C = createVector(width / 2 - camX, height / 2 - camY, camZ)
     cam2.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
+
+    // to place a stationary rect in the middle of the view
+    // push();
+    // translate(camX, camY, camZ);
+    // rotateY(camPan + PI/2);
+    // translate(20 * cos(camPan), 0, 20 * sin(camPan))
+    // rotateY(-camPan + PI/2)
+    // rect(-5, -5, 10, 10)
+    // pop();
+
     C.div(200);
     // C = C*200;
     // v.normalize();
-    directionalLight(255,255,255, C)
-    ambientLight(200);
+    // directionalLight(255,255,255, C)
+    ambientLight(255);
+
+
 
     // controls the movement of the camera
     if (currentCamera === 2) {
@@ -122,7 +140,7 @@ function draw() {
         if (keyIsDown(16)) { // shift
             // camY += moveSpeed;
         }
-        if (keyIsDown(32) && camY > -g1Dims[1]/2 + standHeight) { // spacebar
+        if (keyIsDown(32) && (camY > currentDims[1]/2 - standHeight - 1)) { // spacebar
             jumpVelocity = initialJumpVelocity;
         } else {
             jumpVelocity += gravity;
@@ -139,8 +157,15 @@ function draw() {
     // ambientMaterial(231,4,255);
 
     model(shapes);
-    translate(0, 0, 0);
-    // box(600);
+    push()
+    translate(0,75,0)
+    strokeWeight(1)
+    stroke(0);
+    fill(255)
+    scale(-80);
+    model(dome2);
+    pop()
+
     for (let i = 0; i < boxes.length; i ++) {
         push()
         // translate(boxes[i][0]*1 +random(), boxes[i][1]*1 + random(), boxes[i][2]*1 + random());
@@ -150,6 +175,8 @@ function draw() {
         box(edge)
         pop();
     }
+
+    // values to help movement on mobile devices
     if (touches.length === 0) {
         previousTouch = [];
         // newPinchDistance = 0;
@@ -158,58 +185,63 @@ function draw() {
         midY = "none";
         viewState = "none";
     }
-    // room hitboxes
-    if (camX > g1Dims[0]/2 - wallOffset) {
-        camX = g1Dims[0]/2 - wallOffset;
-    }
-    if (camX < -g1Dims[0]/2 + wallOffset) {
-        camX = -g1Dims[0]/2 + wallOffset;
-    }
-    if (camY > g1Dims[1]/2 - standHeight) {
-        camY = g1Dims[1]/2 - standHeight;
-    }
-    if (camY < -g1Dims[1]/2 + wallOffset) {
-        camY = -g1Dims[1]/2 + wallOffset;
-    }
-    if (camZ > g1Dims[2]/2 - wallOffset) {
-        camZ = g1Dims[2]/2 - wallOffset;
-    }
-    if (camZ < -g1Dims[2]/2 + wallOffset) {
-        camZ = -g1Dims[2]/2 + wallOffset;
-    }
+    ensureHitboxes();
 
-    for (let i = 0; i < boxes.length; i++) { // to keep the camera outside of the floating boxes
-        // let boxesNX = boxes[i][0]*1 + 1;
-        let edge = sin(frameCount/80 + 42*i) * 40; // width, height, and depth
-        let boxPX = boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40 + edge/2 + 5;
-        let boxNX = boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40 - edge/2 - 5;
-        let boxPY = boxes[i][1]*1 + sin(frameCount/200 - 59*i) + edge/2 + 5;
-        let boxNY = boxes[i][1]*1 + sin(frameCount/200 - 59*i) - edge/2 - 5;
-        let boxPZ = boxes[i][2]*1 + sin(frameCount/46 - 100*i) + edge/2 + 5;
-        let boxNZ = boxes[i][2]*1 + sin(frameCount/46 - 100*i) - edge/2 - 5;
-        let insideBox = (camX < boxPX && camX > boxNX) && (camY < boxPY && camY > boxNY) && (camZ < boxPZ && camZ > boxNZ);
-        // let insideBox = (camX > boxPX);
-        if (insideBox) {
-            // camTilt += 0.01;
-            if (camX < boxPX + edge/2 && camX > boxes[i][0]) {
-                camX = boxPX + edge/2;
-            }
-            if (camX > boxNX - edge/2 && camX < boxes[i][0]) {
-                camX = boxNX - edge/2;
-            }
-            if (camY < boxPY + edge/2 && camY > boxes[i][1]) {
-                camY = boxPY + edge/2;
-            }
-            if (camY > boxNY - edge/2 && camY < boxes[i][1]) {
-                camY = boxNY - edge/2;
-            }
-            if (camZ < boxPZ + edge/2 && camZ > boxes[i][2]) {
-                camZ = boxPZ + edge/2;
-            }
-            if (camZ > boxNZ - edge/2 && camZ < boxes[i][2]) {
-                camZ = boxNZ - edge/2;
-            }
-        }
+    // for (let i = 0; i < boxes.length; i++) { // to keep the camera outside of the floating boxes
+    //     // let boxesNX = boxes[i][0]*1 + 1;
+    //     let edge = sin(frameCount/80 + 42*i) * 40; // width, height, and depth
+    //     let boxPX = boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40 + edge/2 + 5;
+    //     let boxNX = boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40 - edge/2 - 5;
+    //     let boxPY = boxes[i][1]*1 + sin(frameCount/200 - 59*i) + edge/2 + 5;
+    //     let boxNY = boxes[i][1]*1 + sin(frameCount/200 - 59*i) - edge/2 - 5;
+    //     let boxPZ = boxes[i][2]*1 + sin(frameCount/46 - 100*i) + edge/2 + 5;
+    //     let boxNZ = boxes[i][2]*1 + sin(frameCount/46 - 100*i) - edge/2 - 5;
+    //     let insideBox = (camX < boxPX && camX > boxNX) && (camY < boxPY && camY > boxNY) && (camZ < boxPZ && camZ > boxNZ);
+    //     // let insideBox = (camX > boxPX);
+    //     if (insideBox) {
+    //         // camTilt += 0.01;
+    //         if (camX < boxPX + edge/2 && camX > boxes[i][0]) {
+    //             camX = boxPX + edge/2;
+    //         }
+    //         if (camX > boxNX - edge/2 && camX < boxes[i][0]) {
+    //             camX = boxNX - edge/2;
+    //         }
+    //         if (camY < boxPY + edge/2 && camY > boxes[i][1]) {
+    //             camY = boxPY + edge/2;
+    //         }
+    //         if (camY > boxNY - edge/2 && camY < boxes[i][1]) {
+    //             camY = boxNY - edge/2;
+    //         }
+    //         if (camZ < boxPZ + edge/2 && camZ > boxes[i][2]) {
+    //             camZ = boxPZ + edge/2;
+    //         }
+    //         if (camZ > boxNZ - edge/2 && camZ < boxes[i][2]) {
+    //             camZ = boxNZ - edge/2;
+    //         }
+    //     }
+    // }
+
+}
+
+function ensureHitboxes() {
+    // room hitboxes
+    if (camX > currentDims[0]/2 - wallOffset) {
+        camX = currentDims[0]/2 - wallOffset;
+    }
+    if (camX < -currentDims[0]/2 + wallOffset) {
+        camX = -currentDims[0]/2 + wallOffset;
+    }
+    if (camY > currentDims[1]/2 - standHeight) {
+        camY = currentDims[1]/2 - standHeight;
+    }
+    if (camY < -currentDims[1]/2 + wallOffset) {
+        camY = -currentDims[1]/2 + wallOffset;
+    }
+    if (camZ > currentDims[2]/2 - wallOffset) {
+        camZ = currentDims[2]/2 - wallOffset;
+    }
+    if (camZ < -currentDims[2]/2 + wallOffset) {
+        camZ = -currentDims[2]/2 + wallOffset;
     }
 }
 
@@ -256,6 +288,7 @@ function mouseDragged() {
         }
         pinchDistance = newPinchDistance;
     }
+    ensureHitboxes();
 }
 
 function mouseReleased() {
@@ -280,39 +313,39 @@ function makeGallery() {
     beginGeometry();
     // Negative Z wall (front)
     push()
-    translate(0, 0, -g1Dims[2]/2);
+    translate(0, 0, -currentDims[2]/2);
     rotateY(0);
-    rect(-g1Dims[0]/2, -g1Dims[1]/2, g1Dims[0], g1Dims[1]);
+    rect(-currentDims[0]/2, -currentDims[1]/2, currentDims[0], currentDims[1]);
     pop()
     // Positive X wall (right)
     push()
-    translate(g1Dims[0]/2, 0, 0);
+    translate(currentDims[0]/2, 0, 0);
     rotateY(-PI/2);
-    rect(-g1Dims[2]/2, -g1Dims[1]/2, g1Dims[2], g1Dims[1]);
+    rect(-currentDims[2]/2, -currentDims[1]/2, currentDims[2], currentDims[1]);
     pop()
     // Positive Z wall (behind)
     push()
-    translate(0, 0, g1Dims[2]/2);
+    translate(0, 0, currentDims[2]/2);
     rotateY(PI);
-    rect(-g1Dims[0]/2, -g1Dims[1]/2, g1Dims[0], g1Dims[1]);
+    rect(-currentDims[0]/2, -currentDims[1]/2, currentDims[0], currentDims[1]);
     pop()
     // Negative X wall (left)
     push()
-    translate(-g1Dims[0]/2, 0, 0);
+    translate(-currentDims[0]/2, 0, 0);
     rotateY(PI/2);
-    rect(-g1Dims[2]/2, -g1Dims[1]/2, g1Dims[2], g1Dims[1]);
+    rect(-currentDims[2]/2, -currentDims[1]/2, currentDims[2], currentDims[1]);
     pop()
     // Ceiling
     push()
-    translate(0, g1Dims[1]/2, 0);
+    translate(0, currentDims[1]/2, 0);
     rotateX(PI/2);
-    rect(-g1Dims[0]/2, -g1Dims[2]/2, g1Dims[0], g1Dims[2]);
+    rect(-currentDims[0]/2, -currentDims[2]/2, currentDims[0], currentDims[2]);
     pop()
     // Floor
     push()
-    translate(0, -g1Dims[1]/2, 0);
+    translate(0, -currentDims[1]/2, 0);
     rotateX(-PI/2);
-    rect(-g1Dims[0]/2, -g1Dims[2]/2, g1Dims[0], g1Dims[2]);
+    rect(-currentDims[0]/2, -currentDims[2]/2, currentDims[0], currentDims[2]);
     pop()
     shapes = endGeometry();
 }
@@ -324,3 +357,10 @@ function makeGallery() {
 //     }
 //     endShape();
 // }
+
+
+class Room {
+    constructor(name) {
+
+    }
+}
