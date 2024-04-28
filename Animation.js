@@ -61,6 +61,9 @@ let cam3;
 
 let fraction = 0.6; // the fraction of the width of the screen taken up by the strange rect
 
+
+let rows = 3 // the number of rows of arches-blocks there are
+
 function preload() {
     img = loadImage('./Franky.jpg');
     // dome = loadModel('./Fancy\ Dome.obj');
@@ -137,7 +140,7 @@ function draw() {
         pop();
     }
 
-    // controls the movement of the camera
+    // controls the movement of the camera and various elements in the scene
     if (keyIsDown(188)) {
         fraction -= 0.01;
         if (fraction <= 0) {
@@ -256,7 +259,6 @@ function draw() {
     fill(255)
     scale(-60);
     // model(dome2); // with scale = -80
-    let rows = 3
     for (let i = 0; i < rows; i++) {
         push()
         translate(0,0,i*8-8*rows/2)
@@ -408,6 +410,20 @@ function mouseDragged() {
         pinchDistance = newPinchDistance;
     }
     ensureHitboxes();
+}
+
+function keyPressed() {
+    if (keyCode === 75) {
+        rows --
+        if (rows <= 0) {
+            rows = 0;
+        }
+    } else if (keyCode === 76) {
+        rows ++
+        if (rows >= 7) {
+            rows = 7;
+        }
+    }
 }
 
 function mouseReleased() {
