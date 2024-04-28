@@ -256,7 +256,7 @@ function draw() {
     fill(255)
     scale(-60);
     // model(dome2); // with scale = -80
-    let rows = 8
+    let rows = 3
     for (let i = 0; i < rows; i++) {
         push()
         translate(0,0,i*8-8*rows/2)
