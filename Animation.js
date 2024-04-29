@@ -31,13 +31,7 @@ let cam;
 
 let boxes = [];
 
-let g1Dims = [300,150,1200]; // Gallery 1 Dimensions
 let wallOffset = 10; // The minimum distance from the camera to any wall
-
-
-let G2;
-let G2BoundaryPoints = [[150, 0, 600],[150, 0, -600],[-150, 0, -600],[-150, 0, -600]];
-let G2Height = 300;
 
 let img;
 let dome;
@@ -45,10 +39,7 @@ let dome2;
 let arches;
 
 
-// Inset Camera Testing
-// let capture
-
-let doCamTexture = false;
+let doCamTexture = true;
 let camTexture;
 
 let viewX, viewY, viewZ;
@@ -56,7 +47,7 @@ let viewX, viewY, viewZ;
 
 
 let fraction = 0.6; // the fraction of the width of the screen taken up by the strange rect
-let rows = 0 // the number of rows of arches-blocks there are
+let rows = 2 // the number of rows of arches-blocks there are
 let numBoxes = 5
 
 function preload() {
@@ -105,6 +96,62 @@ function draw() {
         }
     }
 
+
+    updateCamera();
+    push()
+    translate(0,75,0)
+    strokeWeight(0.5)
+    fill(255)
+    scale(-60);
+    // model(dome2); // with scale = -80
+    for (let i = 0; i < rows; i++) {
+        push()
+        translate(0,0,i*8-8*rows/2)
+        for (let j = 0; j < rows; j++) {
+            push()
+            translate(j*8-8*rows/2,0,0)
+            // normalMaterial()
+            // ambientMaterial();
+            model(arches)
+            pop()
+        }
+        pop()
+    }
+    pop()
+
+    if (doCamTexture) {
+        camTexture.push()
+        camTexture.translate(0,75,0)
+        camTexture.strokeWeight(1)
+        camTexture.fill(255)
+        camTexture.scale(-60);
+        for (let i = 0; i < rows; i++) {
+            camTexture.push()
+            camTexture.translate(0,0,i*8-8*rows/2)
+            for (let j = 0; j < rows; j++) {
+                camTexture.push()
+                camTexture.translate(j*8-8*rows/2,0,0)
+                camTexture.normalMaterial()
+                camTexture.model(arches)
+                camTexture.pop()
+            }
+            camTexture.pop()
+        }
+        camTexture.pop()
+    }
+
+    // values to help movement on mobile devices
+    if (touches.length === 0) {
+        previousTouch = [];
+        // newPinchDistance = 0;
+        pinchDistance = 0;
+        midX = "none";
+        midY = "none";
+        viewState = "none";
+    }
+}
+
+function updateCamera() {
     // controls the movement of the camera and various elements in the scene
     if (keyIsDown(188)) {
         fraction -= 0.01;
@@ -164,16 +211,22 @@ function draw() {
     camY -= jumpVelocity; // this makes things fall sometimes
 
     ensureOnlyFloor()
-
     cam.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
+
+    cam.pan(camPan);
+    cam.tilt(camTilt);
+
+
+    viewX = camX - sin(camPan) * cos(camTilt)*20.4;
+    viewY = camY + sin(camTilt)*20.4;
+    viewZ = camZ - cos(camPan) * cos(camTilt)*20.4;
 
     // to place a stationary rect in the middle of the view
     push();
-    translate(camX, camY, camZ);
-    rotateY(camPan + PI/2);
-    translate(20 * cos(camPan), 0, 20 * sin(camPan))
-    rotateY(-camPan - PI/2) // oh my god Frankie was reversed the whole time and I didn't see it
-    let s = fraction*23; // 23 fills the page
+    translate(viewX, viewY, viewZ); // oh my god Frankie was reversed the whole time and I didn't see it
+    rotateY(camPan);
+    rotateX(camTilt);     
+    let s = fraction*23.6; // 23.6 fills the page
     // rect(-s*width/height/2, -s/2, s*width/height, s)
     if (doCamTexture) {
         texture(camTexture)
@@ -183,79 +236,15 @@ function draw() {
         vertex(s*width/height/2, s/2, 0, width/2 + fraction*width/2, height/2 + fraction*height/2) // width/2, height/2 when fraction = 0 vs width, height when fraction = 1
         vertex(-s*width/height/2, s/2, 0, width/2 - fraction*width/2, height/2 + fraction*height/2)
         endShape(CLOSE)
-        }
+    }
     pop();
     if (doCamTexture) {
         camTexture.background(255)
-    }
-    lights()
 
-    cam.pan(camPan);
-    cam.tilt(camTilt);
-
-    if (doCamTexture) {
-        viewX = camX - sin(camPan) * cos(camTilt) * 200;
-        viewY = camY + sin(camTilt) * 200;
-        viewZ = camZ - cos(camPan) * cos(camTilt) * 200;
-        
         camTexture.camera(camX, camY, camZ, viewX, viewY, viewZ, 0, 1, 0)
         camTexture.perspective(PI/3, width / height, 5*sqrt(3), 10000*sqrt(3))
     }
-
-    push()
-    translate(0,75,0)
-    strokeWeight(0.5)
-    fill(255)
-    scale(-60);
-    // model(dome2); // with scale = -80
-    for (let i = 0; i < rows; i++) {
-        push()
-        translate(0,0,i*8-8*rows/2)
-        for (let j = 0; j < rows; j++) {
-            push()
-            translate(j*8-8*rows/2,0,0)
-            // normalMaterial()
-            // ambientMaterial();
-            model(arches)
-            pop()
-        }
-        pop()
-    }
-    pop()
-
-    if (doCamTexture) {
-        camTexture.push()
-        camTexture.translate(0,75,0)
-        camTexture.strokeWeight(1)
-        camTexture.fill(255)
-        camTexture.scale(-60);
-        for (let i = 0; i < rows; i++) {
-            camTexture.push()
-            camTexture.translate(0,0,i*8-8*rows/2)
-            for (let j = 0; j < rows; j++) {
-                camTexture.push()
-                camTexture.translate(j*8-8*rows/2,0,0)
-                camTexture.normalMaterial()
-                camTexture.model(arches)
-                camTexture.pop()
-            }
-            camTexture.pop()
-        }
-        camTexture.pop()
-    }
-
-    // values to help movement on mobile devices
-    if (touches.length === 0) {
-        previousTouch = [];
-        // newPinchDistance = 0;
-        pinchDistance = 0;
-        midX = "none";
-        midY = "none";
-        viewState = "none";
-    }
-    // ensureHitboxes();
-    // remainWithinBounds()
-
+    lights()
 }
 
 function ensureOnlyFloor() {
