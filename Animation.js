@@ -1,5 +1,5 @@
 var camX = 0;
-var camY = 50;
+var camY = 0;
 var camZ = 0;
 var camTilt = 0;
 var maxCamTilt = Math.PI / 6.001; // div by 2.001 limits view to straight up and down
@@ -44,8 +44,10 @@ let viewX, viewY, viewZ;
 
 
 let fraction = 0.2; // the fraction of the width of the screen taken up by the strange rect
-let rows = 3 // the number of rows of arches-blocks there are
-let numBoxes = 5
+let rows = 7 // the number of rows of arches-blocks there are
+let numBoxes = 0
+
+let lightColor = color(255,255,255);
 
 function preload() {
     img = loadImage('./Franky.jpg');
@@ -65,36 +67,46 @@ function setup() {
     for (let i = 0; i < numBoxes; i++) {
         boxes[i] = [[random()*400-200], [random()*400-200], [random()*400-200]];
     }
-
-
+    noStroke();
+    lightFalloff(1,0,0.000006) //0.1,0,0.000009 works okay
 }
 
 function draw() {
-    background(255);
+    background(0);
 
     // to place floating cubes
 
-    // for (let i = 0; i < boxes.length; i ++) {
-    //     push()
-    //     translate(boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40, boxes[i][1]*1 + sin(frameCount/200 - 59*i) * 20, boxes[i][2]*1 + sin(frameCount/46 - 100*i) * 17);
-    //     box(40)
-    //     pop();
-    // }
+    for (let i = 0; i < boxes.length; i ++) {
+        push()
+        translate(boxes[i][0]*1 + sin(frameCount/100 - 70*i) * 40, boxes[i][1]*1 + sin(frameCount/200 - 59*i) * 20, boxes[i][2]*1 + sin(frameCount/46 - 100*i) * 17);
+        // ambientMaterial(25,213,24)
+        box(50)
+        pop();
+    }
 
+    push()
+    translate(camX, camY, camZ)
+    // box(20)
+    pop()
 
     updateCamera();
 
     push()
     strokeWeight(0.5)
-    scale(Scale);
+    // translate(5.333,0,5.333);
     for (let i = 0; i < rows; i++) {
         push()
-        translate(0,0,i*8-5.333*rows/2)
+        translate(0,0,Scale*(i*8-4*rows/2))
+        // translate(0,0,i*8-5.333*rows/2)
         for (let j = 0; j < rows; j++) {
             push()
-            translate(j*8-5.333*rows/2,0,0)
+            translate(Scale*(j*8-4*rows/2),0,0)
+            
+            // translate(j*8-5.333*rows/2,0,0)
             // normalMaterial()
             // ambientMaterial();
+            box(Scale*8, 1, Scale*8)
+            scale(Scale);
             model(arches)
             pop()
         }
@@ -193,7 +205,18 @@ function updateCamera() {
     // rect(-s*width/height/2, -s/2, s*width/height, s)
     // pop();
 
-    lights()
+    // lights()
+    // pointLight(255,255,100,camX,camY+600,camZ)
+
+    translate(camX+camTilt*500, camY, camZ-400)
+
+    pointLight(color(255,255,255),camX, camY, camZ)
+
+    // sphere(100)
+    translate(-(camX+camTilt*500), -(camY), -(camZ-400))
+    // push()
+    // translate(camX+400, camY, camZ-400)
+    // pop()
 }
 
 function ensureOnlyFloor() {
@@ -209,18 +232,42 @@ function ensureOnlyFloor() {
 function remainWithinBounds() {
     push()
     let b = rows - 2; // the number of traversible arch sections
-    if (camX > 8*Scale*b) {
-        camX = -8*Scale*b
+    let border = abs(Scale)*4 + 0 // total width 
+    let diff = 0 // 0 makes a buffer of 1 square, abs(Scale)*8 makes a buffer of 0 squares
+
+    if (camX > border + diff) {
+        camX = -border + diff
+    } 
+    else if (camX < -border - diff) {
+        camX = border - diff
     }
-    if (camX < -8*Scale*b) {
-        camX = 8*Scale*b
+
+    if (camZ > border + diff) {
+        camZ = -border + diff
+
+    } else if (camZ < -border - diff) {
+        camZ = border - diff
     }
-    if (camZ > 8*Scale*b) {
-        camZ = -8*Scale*b
-    }
-    if (camZ < -8*Scale*b) {
-        camZ = 8*Scale*b
-    }
+
+    // let diff = 0 
+    let test = 0
+    let mult = b;
+    // if (camX > abs(Scale)*(4+test*(b-1)) + diff) {
+    //     camX = -abs(Scale)*(4+test*(b-1)) + diff - abs(Scale)*8* mult
+    // } 
+    // else if (camX < -abs(Scale)*(4+test*(b-1)) - diff) {
+    //     camX = abs(Scale)*(4+test*(b-1)) - diff + abs(Scale)*8* mult
+    // }
+
+    // if (camZ > abs(Scale)*(4+test*(b-1)) + diff) {
+    //     camZ = -abs(Scale)*(4+test*(b-1)) + diff - abs(Scale)*8* mult
+
+    // } else if (camZ < -abs(Scale)*(4+test*(b-1)) - diff) {
+    //     camZ = abs(Scale)*(4+test*(b-1)) - diff +abs(Scale)*8* mult
+    // }
+
+    // translate(0,0,i*8-5.333*rows/2)
+
     pop()
 }
 
@@ -273,14 +320,14 @@ function mouseDragged() {
 // code to adjust the number of arches
 function keyPressed() {
     if (keyCode === 75) { // k
-        rows --
+        rows -= 2;
         if (rows <= 3) {
             rows = 3;
         }
     } else if (keyCode === 76) { // l
-        rows ++
-        if (rows >= 10) {
-            rows = 10;
+        rows += 2;
+        if (rows >= 15) {
+            rows = 15;
         }
     }
 }

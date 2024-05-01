@@ -48,7 +48,7 @@ let viewX, viewY, viewZ;
 
 let fraction = 0.6; // the fraction of the width of the screen taken up by the strange rect
 let rows = 2 // the number of rows of arches-blocks there are
-let numBoxes = 5
+let numBoxes = 0
 
 function preload() {
     img = loadImage('../Franky.jpg');
