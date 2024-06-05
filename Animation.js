@@ -68,11 +68,11 @@ function setup() {
         boxes[i] = [[random()*400-200], [random()*400-200], [random()*400-200]];
     }
     noStroke();
-    lightFalloff(1,0,0.000006) //0.1,0,0.000009 works okay
+    lightFalloff(1,0.0000,0.000004) //0.1,0,0.000009 works okay
 }
 
 function draw() {
-    background(0);
+    background(128);
 
     // to place floating cubes
 
@@ -94,13 +94,17 @@ function draw() {
     push()
     strokeWeight(0.5)
     // translate(5.333,0,5.333);
+    translate(abs(Scale)*(rows*4-4), 0, abs(Scale)*(rows*4-4))
     for (let i = 0; i < rows; i++) {
         push()
-        translate(0,0,Scale*(i*8-4*rows/2))
+        // translate(0,0,Scale*(i*8 - 4*(rows/2)))
+        translate(0,0,Scale*(i*8-0*rows))
+        // translate(0,0,Scale*(i*8-4*rows/2))
         // translate(0,0,i*8-5.333*rows/2)
         for (let j = 0; j < rows; j++) {
             push()
-            translate(Scale*(j*8-4*rows/2),0,0)
+            // translate(Scale*(j*8 - 4*(rows/2)),0,0)
+            translate(Scale*(j*8-0*rows),0,0)
             
             // translate(j*8-5.333*rows/2,0,0)
             // normalMaterial()
@@ -208,12 +212,12 @@ function updateCamera() {
     // lights()
     // pointLight(255,255,100,camX,camY+600,camZ)
 
-    translate(camX+camTilt*500, camY, camZ-400)
+    // translate(camX+camTilt*500, camY, camZ-400)
 
     pointLight(color(255,255,255),camX, camY, camZ)
 
     // sphere(100)
-    translate(-(camX+camTilt*500), -(camY), -(camZ-400))
+    // translate(-(camX+camTilt*500), -(camY), -(camZ-400))
     // push()
     // translate(camX+400, camY, camZ-400)
     // pop()
