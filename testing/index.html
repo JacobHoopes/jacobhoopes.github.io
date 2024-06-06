@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet"> -->
+ 
+    <title>House Search</title>
+    <meta name="author" content="Jacob Hoopes">
+    <style>
+        html, body  {
+            overflow: hidden;
+            height: 100%;
+            margin: 0;
+        }
+        .mapParent {
+            position: relative;
+            display: grid;
+            justify-items: center;
+            height: calc(75vh - 10px);
+            margin: 5px;
+            overflow: hidden;
+            border-radius: 20px;
+        }
+        .mapChild {
+            position: absolute;
+
+            /* width: calc(100% - 10px); */
+            border: none;
+            height: calc(100% + 160px);
+
+        }
+        .infoTableParent {
+            width: 100%;
+            height: calc(25vh - 6px);
+            overflow: hidden;
+
+            margin: 3px solid white;
+        }
+        .infoTable {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="mapParent">
+        <iframe class="mapChild" style="position:relative; top:-69px" src="https://www.google.com/maps/d/embed?mid=1p8UxQ3muglm1lsIM_ufND62EUiALq8c&ehbc=2E312F" width="100%" height="119%"></iframe>
+    </div>
+    <div class="infoTableParent">
+        <div class ="infoTable">
+        <table style="width:100%">
+            <tr>
+                <th>Address & Map Color</th>
+                <th>Rent</th>
+                <th>Beds / Baths</th>
+                <th>Sq Feet</th>
+            </tr>
+
+            <!-- <tr>
+                <th style="background-color: rgb(0,0,0); color: white">332 NE 76th Ave</th>
+                <th>$3100</th>
+                <th>4 / 2</th>
+                <th>2144</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(0,136,209); color: white">3427 E Burnside St</th>
+                <th>$3250</th>
+                <th>4 / 1.5</th>
+                <th>2400</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(194, 23, 91); color: white">1927 SE Washington St</th>
+                <th>$3550</th>
+                <th>4 / 2</th>
+                <th>2936</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(249, 169, 37); color: white">2313 SE 52nd Ave</th>
+                <th>$3368</th>
+                <th>4 / 2</th>
+                <th>2600</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(103, 58, 183); color: white;">4451 SE 29th Ave</th>
+                <th>$2995</th>
+                <th>5 / 3</th>
+                <th>1660</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(11, 157, 88); color: white;">1524 SE 38th Ave</th>
+                <th>$3300</th>
+                <th>4 / 1.5</th>
+                <th>2000</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(26,35,126); color: white;">2208 SE 43rd Ave #A</th>
+                <th>$2945</th>
+                <th>4 / 1</th>
+                <th>1600</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(175, 180, 44); color: white;">3705 SE 63rd Ave</th>
+                <th>$3495</th>
+                <th>4 / 2</th>
+                <th>2750</th>
+            </tr> -->
+            <tr>
+                <th style="background-color: rgb(255, 82, 82); color: white;"><a href="https://www.zillow.com/homedetails/6725-E-Burnside-St-Portland-OR-97215/2075986402_zpid/">6725 E Burnside St</a></th>
+                <th>$2495</th>
+                <th>3 / 2</th>
+                <th>--</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(137, 13, 79); color: white;"><a href="https://www.zillow.com/homedetails/7645-SE-Clay-St-Portland-OR-97215/53966192_zpid/">7645 SE Clay St</a></th>
+                <th>$2395</th>
+                <th>3 / 1</th>
+                <th>876</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(103, 58 ,183); color: white;"><a href="https://www.zillow.com/homedetails/323-NE-80th-Ave-Portland-OR-97213/53916439_zpid/">323 NE 80th Ave</a></th>
+                <th>$2300</th>
+                <th>3 / 1</th>
+                <th>1750</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(0,97,100); color: white;"><a href="https://www.zillow.com/homedetails/4113-SE-Ivon-St-Portland-OR-97202/53942392_zpid/">4113 SE Ivon St</a></th>
+                <th>$2600</th>
+                <th>3 / 1.5</th>
+                <th>984</th>
+            </tr>
+            <tr>
+                <th style="background-color: rgb(130, 119, 21); color: white;"><a href="https://www.zillow.com/homedetails/3203-SE-74th-Ave-Portland-OR-97206/53891796_zpid/">3203 SE 74th Ave</a></th>
+                <th>$2700</th>
+                <th>3 / 2</th>
+                <th>1288</th>
+            </tr>
+        </table>
+        </div>
+    </div>
+    <!-- <div class="container">
+        <div class="scrollable-div">
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+          <p>This is a long paragraph...</p>
+        </div>
+      </div> -->
+      
+</body>
+
+</html>
