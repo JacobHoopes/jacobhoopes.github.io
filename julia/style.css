@@ -109,13 +109,7 @@ html {
     width: 100%;
 }
 
-.marquee {
-    color: black;
-    font-weight: bold;
-    white-space: nowrap;
-    clear: both;
-    float: left;
-}
+
 
 .flex-container {
     display: flex;
@@ -128,4 +122,18 @@ html {
 
 p, h1, h2, h3, h4 {
     margin: 0;
+}
+
+.marquee {
+    color: black;
+    font-weight: bold;
+    white-space: nowrap;
+    clear: both;
+    float: left;
+}
+
+.marquee > p {
+    text-align: left;
+    margin-top: 10px;
+
 }
