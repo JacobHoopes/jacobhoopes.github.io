@@ -1,7 +1,7 @@
 
 @font-face {
     font-family: GaudyBookletter1911;
-    src: url("/GoudyBookletter1911.otf") format("opentype");
+    src: url("GoudyBookletter1911.otf") format("opentype");
 }
 
 html {
