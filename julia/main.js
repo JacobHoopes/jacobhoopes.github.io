@@ -5,6 +5,8 @@ var angle;
 var newAngle;
 var settledAngle = 0;
 
+
+
 function preload() {
     img = loadImage('./image.png');
 }
@@ -21,6 +23,7 @@ function setup() {
     frameRate(60)
 
     // angle = 90
+    
 }
 
 
