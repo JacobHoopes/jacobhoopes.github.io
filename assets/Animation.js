@@ -41,21 +41,22 @@ let Scale = -20;
 
 let viewX, viewY, viewZ;
 // let camTexture2;
+let s = 200;
 
 
-let fraction = 0.2; // the fraction of the width of the screen taken up by the strange rect
+let fraction = 0.5; // the fraction of the width of the screen taken up by the strange rect
 let rows = 1 // the number of rows of arches-blocks there are
 let numBoxes = 0
 
-let roomRadius = 20;
+let roomRadius = 350; // room radius is 400
 let hallWidth = 10;
 
 let lightColor = color(255,255,255);
 
 function preload() {
     arches = loadModel('./assets/arches.obj');
-    room = loadModel('./assets/room.obj');
-    hall = loadModel('./assets/hall.obj');
+    room = loadModel('./assets/room-simple.obj');
+    hall = loadModel('./assets/hall-simple.obj');
 }
 
 function setup() {
@@ -66,13 +67,14 @@ function setup() {
     cam.perspective(PI/3, width / height, 5*sqrt(3), 10000*sqrt(3));
     setCamera(cam);
 
-    strokeWeight(20);
     stroke(color(0,0,0));
     strokeWeight(1);
-    fill(color(255,255,0));
-    emissiveMaterial(150);
+    // noStroke();
+    fill(color(73,104,65));
+    emissiveMaterial(color(73,104,65));
+    // brightness(255);
     // color(red);
-    lights();
+    // lights();
     lightFalloff(1,0.0000,0.000004) //0.1,0,0.000009 works okay
 
 }
@@ -97,11 +99,13 @@ function draw() {
         rotateY(TWO_PI / 5 * (i+1.5));
         model(room);
         for(let j = 0; j < 2; j++) {
-            push()
+            push();
             rotateY(TWO_PI / 5 * (-i-2+j));
             translate(30,0,0);
-            model(hall)
-            pop()
+            model(hall);
+            translate(20,0,0);
+            model(hall);
+            pop();
         }
         pop();
     }
@@ -178,27 +182,81 @@ function updateCamera() {
     camY -= jumpVelocity; // this makes things fall sometimes
 
     ensureOnlyFloor()
-    // remainWithinBounds();
+    remainWithinBounds();
     cam.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
 
     cam.pan(camPan);
     cam.tilt(camTilt);
 
     pointLight(color(255,255,255),camX, camY, camZ);
+
+    
+    viewX = camX;
+    viewY = camY + sin(camTilt) * 20.4;
+    viewZ = camZ - cos(camPan) * cos(camTilt) * 20.4;
+    // viewZ = camZ - 200;
+    s = fraction * 23.6;
+
+    push();
+    let div = createDiv("HELLO");
+    div.className = "Center";
+    translate(viewX, viewY, viewZ);
+    rotateY(-camPan);
+    rotateX(camTilt);
+    // emissiveMaterial(100,100,100);
+    rect(-s*width/height/2, -s/2, s*width/height, s)
+    div.position(width/2, height/2)
+    strokeWeight(10);
+    textSize(40);
+    fill(0);
+    text("hello", viewX, viewY);
+    pop();
+    // push();
+    // translate(camX, viewY, viewZ)
+    // rect(-s*width/height/2, -s/2, s*width/height, s)
+    // pop()
+    lights();
+    
 }
 
 function ensureOnlyFloor() {
     if (camY > groundHeight/2 - standHeight) {
         camY = groundHeight/2 - standHeight;
     }
-    // if (camY < -currentDims[1]/2 + wallOffset) {
-    //     camY = -currentDims[1]/2 + wallOffset;
+}
+
+function radialDistance(xPos, zPos, xCenter, zCenter) {
+    return sqrt((xPos - xCenter)**2 + (zPos - zCenter)**2);
+}
+
+function reduceDistance(cX, cZ, newD, xCenter, zCenter) {
+    let angle = 0;
+    
+    if (cZ != 0) {
+        angle = atan(cX/cZ);
+    }
+    // if (cX < 0) {
+    //     angle -= PI;
     // }
+    // if (cZ > 0) {
+    //     angle -= HALF_PI;
+    // }
+    let newCamX = newD*(1)*cos(angle);
+    let newCamZ = newD*(1)*sin(angle);
+    return [newCamX + xCenter, newCamZ + zCenter];
+    // return [roomRadius,0]
 }
 
 function remainWithinBounds() {
-    push()
-
+    // push()
+    if (radialDistance(camX, camZ, 0, 0) > roomRadius) { // if(in-a-room && distance-to-center > roomRadius && not(in-a-hall))
+        let newVals = reduceDistance(camX, camZ, roomRadius, 0, 0);
+        camX = newVals[0];
+        camZ = camZ;
+        // distance-to-center = roomRadius;
+    } //else if (true) { // if(in-a-hall && distance-to-center > hallWidth)
+        // distance-to-center = hallWidth;
+   // }
     // if ()
     // let b = rows - 2; // the number of traversible arch sections
     // let border = abs(Scale)*4 + 0 // total width 
@@ -217,7 +275,7 @@ function remainWithinBounds() {
     // } else if (camZ < -border - diff) {
     //     camZ = border - diff
     // }
-    pop()
+    // pop()
 }
 
 // movement with the mouse and on mobile

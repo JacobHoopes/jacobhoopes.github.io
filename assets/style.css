@@ -79,6 +79,11 @@ a {
     box-sizing: border-box;
 }
 
+.Center {
+    color: red;
+    background-color: blue;
+    font
+}
 
 @media (max-width: 500px) {
     .flex-item {
@@ -106,3 +111,4 @@ a {
 #outerDiv > div {
     position:absolute;
 }
+
