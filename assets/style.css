@@ -79,11 +79,39 @@ a {
     box-sizing: border-box;
 }
 
-.Center {
-    color: red;
-    background-color: blue;
-    font
+.divText {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 7px solid black;
 }
+
+.innerDivText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    flex-direction: column;
+    
+    
+}
+
+.innerDivText > p {
+    margin: 0px;
+
+    box-sizing: border-box;
+    border: 1px solid black;
+    background-color: white;
+    width: 50%;
+}
+
 
 @media (max-width: 500px) {
     .flex-item {

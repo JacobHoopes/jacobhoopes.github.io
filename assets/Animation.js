@@ -53,6 +53,9 @@ let hallWidth = 10;
 
 let lightColor = color(255,255,255);
 
+
+let quadrant = 0;
+
 function preload() {
     arches = loadModel('./assets/arches.obj');
     room = loadModel('./assets/room-simple.obj');
@@ -67,23 +70,28 @@ function setup() {
     cam.perspective(PI/3, width / height, 5*sqrt(3), 10000*sqrt(3));
     setCamera(cam);
 
-    stroke(color(0,0,0));
-    strokeWeight(1);
-    // noStroke();
-    fill(color(73,104,65));
-    emissiveMaterial(color(73,104,65));
-    // brightness(255);
-    // color(red);
-    // lights();
+    // stroke(color(0,0,0));
+    // strokeWeight(0);
+    noStroke();
+    fill(color(73, 104, 65));
+    emissiveMaterial(color(100));
+    // 46, 142, 133 (stone)
+    // 34, 139, 34 (forest green)
+    // 73, 104, 65 (light green)
+
     lightFalloff(1,0.0000,0.000004) //0.1,0,0.000009 works okay
+
+    let divText = createElement('div');
+    divText.class('divText');
+    divText.position(0,0);   
 
 }
 
 function draw() {
-    background(255);
+    background(color(135,206,235));
 
     updateCamera();
-
+    addInnerRect();
     scale(Scale);
 
     model(room);
@@ -181,42 +189,14 @@ function updateCamera() {
 
     camY -= jumpVelocity; // this makes things fall sometimes
 
-    ensureOnlyFloor()
+    document.getElementsByClassName("divText")[0].innerHTML = "<div class='innerDivText'></div>";
+    // document.getElementsByClassName("innerDivText")[0].innerHTML = "<p>Welcome to my site! Navigate with WASD and arrow keys. Or swipe and zoom on mobile.</p>";
+
+    ensureOnlyFloor();
     remainWithinBounds();
-    cam.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
+    placeCamera();
 
-    cam.pan(camPan);
-    cam.tilt(camTilt);
-
-    pointLight(color(255,255,255),camX, camY, camZ);
-
-    
-    viewX = camX;
-    viewY = camY + sin(camTilt) * 20.4;
-    viewZ = camZ - cos(camPan) * cos(camTilt) * 20.4;
-    // viewZ = camZ - 200;
-    s = fraction * 23.6;
-
-    push();
-    let div = createDiv("HELLO");
-    div.className = "Center";
-    translate(viewX, viewY, viewZ);
-    rotateY(-camPan);
-    rotateX(camTilt);
-    // emissiveMaterial(100,100,100);
-    rect(-s*width/height/2, -s/2, s*width/height, s)
-    div.position(width/2, height/2)
-    strokeWeight(10);
-    textSize(40);
-    fill(0);
-    text("hello", viewX, viewY);
-    pop();
-    // push();
-    // translate(camX, viewY, viewZ)
-    // rect(-s*width/height/2, -s/2, s*width/height, s)
-    // pop()
-    lights();
-    
+    // lights();
 }
 
 function ensureOnlyFloor() {
@@ -225,57 +205,69 @@ function ensureOnlyFloor() {
     }
 }
 
+function placeCamera() {
+    cam.camera(camX, camY, camZ, camX, camY, camZ-200, 0, 1, 0);
+    
+    cam.pan(camPan);
+    cam.tilt(camTilt);
+
+    pointLight(color(255,255,255),camX, camY, camZ);
+}
+
+function addInnerRect() {
+    viewX = camX - sin(camPan) * cos(camTilt)*20.4;
+    viewY = camY + sin(camTilt) * 20.4;
+    viewZ = camZ - cos(camTilt) * cos(camPan) * 20.4;
+    s = fraction * 23.6;
+
+    push();
+    translate(viewX, viewY, viewZ);
+    rotateY(camPan);
+    rotateX(camTilt);
+    rect(-s*width/height/2, -s/2, s*width/height, s)
+    pop();
+}
+
 function radialDistance(xPos, zPos, xCenter, zCenter) {
     return sqrt((xPos - xCenter)**2 + (zPos - zCenter)**2);
 }
 
 function reduceDistance(cX, cZ, newD, xCenter, zCenter) {
-    let angle = 0;
-    
-    if (cZ != 0) {
-        angle = atan(cX/cZ);
+    let quadrant = 0;
+    let angle = atan(camX/camZ) - HALF_PI;
+    if (camX >= 0 && camZ >= 0) { // quadrant 1
+        angle = abs(angle);
+        quadrant = 1;
+    } else if (camX < 0 && camZ > 0) { // quadrant 2
+        angle = abs(angle);
+        quadrant = 2;
+    } else if (camX <= 0 && camZ <= 0) { // quadrant 3
+        angle = PI - angle;
+        quadrant = 3;
+    } else if (camX > 0 && camZ < 0) { // quadrant 4
+        angle = PI - angle;
+        quadrant = 4;
     }
-    // if (cX < 0) {
-    //     angle -= PI;
-    // }
-    // if (cZ > 0) {
-    //     angle -= HALF_PI;
-    // }
-    let newCamX = newD*(1)*cos(angle);
-    let newCamZ = newD*(1)*sin(angle);
-    return [newCamX + xCenter, newCamZ + zCenter];
+    let newCamX = newD*cos(angle);
+    let newCamZ = newD*sin(angle);
+    
+    
+
+    return [newCamX, newCamZ];
     // return [roomRadius,0]
 }
-
 function remainWithinBounds() {
-    // push()
-    if (radialDistance(camX, camZ, 0, 0) > roomRadius) { // if(in-a-room && distance-to-center > roomRadius && not(in-a-hall))
+    let d = radialDistance(camX, camZ, 0, 0);
+    if (d > roomRadius) { // if(in-a-room && distance-to-center > roomRadius && not(in-a-hall))
         let newVals = reduceDistance(camX, camZ, roomRadius, 0, 0);
         camX = newVals[0];
-        camZ = camZ;
+        camZ = newVals[1];
+        
         // distance-to-center = roomRadius;
     } //else if (true) { // if(in-a-hall && distance-to-center > hallWidth)
         // distance-to-center = hallWidth;
-   // }
-    // if ()
-    // let b = rows - 2; // the number of traversible arch sections
-    // let border = abs(Scale)*4 + 0 // total width 
-    // let diff = 0 // 0 makes a buffer of 1 square, abs(Scale)*8 makes a buffer of 0 squares
-
-    // if (camX > border + diff) {
-    //     camX = -border + diff
-    // } 
-    // else if (camX < -border - diff) {
-    //     camX = border - diff
     // }
-
-    // if (camZ > border + diff) {
-    //     camZ = -border + diff
-
-    // } else if (camZ < -border - diff) {
-    //     camZ = border - diff
-    // }
-    // pop()
+    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>distance: ${floor(d*100)/100}</p>`
 }
 
 // movement with the mouse and on mobile
