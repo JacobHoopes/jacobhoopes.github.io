@@ -55,11 +55,17 @@ let lightColor = color(255,255,255);
 
 
 let quadrant = 0;
+let currentSpaces = [];
+
+let font;
+let fontSize = 40;
+var space;
 
 function preload() {
     // arches = loadModel('./assets/arches.obj');
     room = loadModel('./assets/room-simple.obj');
     hall = loadModel('./assets/hall-simple.obj');
+    font = loadFont('./assets/Roboto-Light.ttf')
 }
 
 function setup() {
@@ -83,21 +89,34 @@ function setup() {
 
     let divText = createElement('div');
     divText.class('divText');
-    divText.position(0,0);   
+    divText.position(0,0);  
+    
+    space = ["none", 0];
 
 }
 
 function draw() {
     background(color(135,206,235));
-
+    
     updateCamera();
     // addInnerRect();
     scale(Scale);
 
     model(room);
     push()
+    
     for (let i = 0; i < 5; i++) {
         push()
+
+        push()
+        fill(0);
+        strokeWeight(20);
+        stroke(0);
+        rotateY(TWO_PI/5 * i)
+        line(10,5,0, 100,5,0)
+        fill(20);
+        text("hello", 10, 5, 0)
+        pop()
         rotateY(TWO_PI / 5 * i);
         translate(30,0,0);
         model(hall);
@@ -195,8 +214,14 @@ function updateCamera() {
     ensureOnlyFloor();
     remainWithinBounds();
     placeCamera();
-
     // lights();
+}
+
+function placeText() {
+
+        textAlign(CENTER, CENTER);
+        fill(100);
+        text('HELLO', 0, 0);
 }
 
 function ensureOnlyFloor() {
@@ -232,42 +257,122 @@ function radialDistance(xPos, zPos, xCenter, zCenter) {
     return sqrt((xPos - xCenter)**2 + (zPos - zCenter)**2);
 }
 
-function reduceDistance(cX, cZ, newD, xCenter, zCenter) {
-    let quadrant = 0;
-    let angle = atan(cX/cZ) - HALF_PI;
+function linearDistance(x1, z1, x2, z2, pointX, pointZ) {
+    let A = z2 - z1;
+    let B = x1 - x2;
+    let C = z1 * x2 - z2 * x1;
+    return (abs(A * pointX + B * pointZ + C) / sqrt(A**2 + B**2))
+}
+
+function reduceRadialDistance(cX, cZ, newD) {
+    let angle = 0;
+    if (cZ != 0) {
+        angle = atan(cX/cZ) - HALF_PI;
+    }
+    
     if (cX >= 0 && cZ >= 0) { // quadrant 1
         angle = abs(angle);
-        quadrant = 1;
     } else if (cX < 0 && cZ > 0) { // quadrant 2
         angle = abs(angle);
-        quadrant = 2;
     } else if (cX <= 0 && cZ <= 0) { // quadrant 3
         angle = PI - angle;
-        quadrant = 3;
     } else if (cX > 0 && cZ < 0) { // quadrant 4
         angle = PI - angle;
-        quadrant = 4;
     }
     let newCamX = newD*cos(angle);
     let newCamZ = newD*sin(angle);
-    
-    
 
     return [newCamX, newCamZ];
     // return [roomRadius,0]
 }
+
+function reduceLinearDistance(cX, cZ, newD) {
+    return [0,0];
+}
+
 function remainWithinBounds() {
-    let d = radialDistance(camX, camZ, 0, 0);
-    if (d > roomRadius) { // if(in-a-room && distance-to-center > roomRadius && not(in-a-hall))
-        let newVals = reduceDistance(camX, camZ, roomRadius, 0, 0);
+    // let space = ["room", 0];
+    let dr = radialDistance(camX, camZ, 0, 0);
+
+    let dl = 1000;
+
+    let hX = 0;
+    let hZ = 0;
+
+    var OverZero = 0;
+    let mod_angle = 0;
+    let distance = 0;
+
+    for (let i = 0; i < 5; i++) {
+        // OverZero = 0;
+
+        mod_angle = TWO_PI/5 * i;
+        hX = cos(mod_angle) * 100;
+        hZ = sin(mod_angle) * 100;
+
+        if (hX != 0 && hZ == 0) {
+            OverZero = hX / abs(hX) * camX;
+        } else if (hX == 0 && hZ != 0) {
+            OverZero = hZ / abs(hZ) * camZ;
+        } else if (hX != 0 && hZ != 0) {
+            OverZero = hX / abs(hX) * camZ + hZ / abs(hZ) * camX;
+        }
+        // let 
+        // if (camX / abs(camX) * cos(mod_angle+PI) < 0 && camZ / abs(camZ) * sin(mod_angle+PI) < 0) { // if cam is on the opposite side of the room from the relevant door
+        //     distance = dl;
+        // }   
+        if (OverZero >= 0) {
+            distance = linearDistance(-100*cos(mod_angle),-100*sin(mod_angle), 100*cos(mod_angle),100*sin(mod_angle), camX, camZ);
+        }
+        if (distance < dl) {
+            dl = distance;
+        }
+        // dl = linearDistance(-100*cos(mod_angle),-100*sin(mod_angle), 100*cos(mod_angle),100*sin(mod_angle), camX, camZ);
+    }
+
+
+    let newVals = [camX, camZ];
+    
+    if (dl < hallWidth && dr > roomRadius) {
+        space[0] = "hall";
+    } else if (dr < roomRadius && dl > hallWidth) {
+        space[0] = "room";
+    }
+    if (space[0] == "hall") {
+        newVals = reduceLinearDistance(camX, camZ, hallWidth);
+        // camX = newVals[0];
+        // camZ = newVals[1];
+    }
+    if (space[0] == "room" && dr > roomRadius) {
+        newVals = reduceRadialDistance(camX, camZ, roomRadius);
         camX = newVals[0];
         camZ = newVals[1];
+    } 
+
+
+    // else if (space[0] == "hall") {
+    //     let newVals = reduceLinearDistance(camX, camZ, hallWidth);
+    //     camX = newVals[0];
+    //     camZ = newVals[1];
+    // }
+
+    // if (dr > roomRadius) { // if(in-a-room && distance-to-center > roomRadius && not(in-a-hall))
+    //     // space[0] = 
         
-        // distance-to-center = roomRadius;
-    } //else if (true) { // if(in-a-hall && distance-to-center > hallWidth)
+        
+    //     // distance-to-center = roomRadius;
+    // } else if (dl < hallWidth) {
+    //     // space[0] = "room";
+    // }
+
+    // if (dl > hallWidth) {
+
+    // }
+
+    //else if (true) { // if(in-a-hall && distance-to-center > hallWidth)
         // distance-to-center = hallWidth;
     // }
-    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>distance: ${floor(d*100)/100}</p>`
+    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>Radial distance: ${floor(dr*100)/100}</p><p>Linear Distance: ${floor(dl*100)/100}</p><p>${space[0]} ${space[1]}</p><p>testing</p>`
 }
 
 // movement with the mouse and on mobile
@@ -313,22 +418,7 @@ function mouseDragged() {
         }
         pinchDistance = newPinchDistance;
     }
-    ensureOnlyFloor();
-}
-
-// code to adjust the number of arches
-function keyPressed() {
-    if (keyCode === 75) { // k
-        rows -= 2;
-        if (rows <= 3) {
-            rows = 3;
-        }
-    } else if (keyCode === 76) { // l
-        rows += 2;
-        if (rows >= 15) {
-            rows = 15;
-        }
-    }
+    // ensureOnlyFloor();
 }
 
 function mouseReleased() {
