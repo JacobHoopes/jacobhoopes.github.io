@@ -62,6 +62,7 @@ let fontSize = 40;
 var space;
 
 var angle_value = "";
+var touchesNumber = 0;
 
 function preload() {
     // arches = loadModel('./assets/arches.obj');
@@ -342,7 +343,7 @@ function remainWithinBounds() {
     } 
 
 
-    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>Radial distance: ${floor(dr*100)/100}</p><p>Linear Distance: ${floor(dl*100)/100}</p><p>${space[0]} ${space[1]}</p><p>Closest angle value: ${angle_value}</p>`
+    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>Radial distance: ${floor(dr*100)/100}</p><p>Linear Distance: ${floor(dl*100)/100}</p><p>${space[0]} ${space[1]}</p><p>Closest angle value: ${angle_value}</p><p>Number of Touches: ${touchesNumber}</p>`
 }
 
 // movement with the mouse and on mobile
@@ -389,6 +390,7 @@ function mouseDragged() {
         pinchDistance = newPinchDistance;
     }
     // ensureOnlyFloor();
+    touchesNumber = touches.length;
 }
 
 function mouseReleased() {
