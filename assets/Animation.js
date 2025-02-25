@@ -61,6 +61,8 @@ let font;
 let fontSize = 40;
 var space;
 
+var angle_value = "";
+
 function preload() {
     // arches = loadModel('./assets/arches.obj');
     room = loadModel('./assets/room-simple.obj');
@@ -287,61 +289,51 @@ function reduceRadialDistance(cX, cZ, newD) {
 }
 
 function reduceLinearDistance(cX, cZ, newD) {
+
+
     return [0,0];
 }
 
 function remainWithinBounds() {
-    // let space = ["room", 0];
     let dr = radialDistance(camX, camZ, 0, 0);
-
     let dl = 1000;
 
-    let hX = 0;
-    let hZ = 0;
-
-    var OverZero = 0;
     let mod_angle = 0;
-    let distance = 0;
+    let distance = dl;
 
+    // calculation to get an accurate angle between the camera position and the x-axis
+    let est_angle = atan(camX/camZ);
+    if (est_angle < 0 ) {
+        est_angle = est_angle + PI;
+    }
+    if (camX > 0) {
+        est_angle += PI;
+    }
+    est_angle = TWO_PI - (est_angle + HALF_PI) % TWO_PI;
+    angle_value = floor(est_angle / TWO_PI * 360*100)/100;
     for (let i = 0; i < 5; i++) {
-        // OverZero = 0;
-
         mod_angle = TWO_PI/5 * i;
-        hX = cos(mod_angle) * 100;
-        hZ = sin(mod_angle) * 100;
-
-        if (hX != 0 && hZ == 0) {
-            OverZero = hX / abs(hX) * camX;
-        } else if (hX == 0 && hZ != 0) {
-            OverZero = hZ / abs(hZ) * camZ;
-        } else if (hX != 0 && hZ != 0) {
-            OverZero = hX / abs(hX) * camZ + hZ / abs(hZ) * camX;
-        }
-        // let 
-        // if (camX / abs(camX) * cos(mod_angle+PI) < 0 && camZ / abs(camZ) * sin(mod_angle+PI) < 0) { // if cam is on the opposite side of the room from the relevant door
-        //     distance = dl;
-        // }   
-        if (OverZero >= 0) {
-            distance = linearDistance(-100*cos(mod_angle),-100*sin(mod_angle), 100*cos(mod_angle),100*sin(mod_angle), camX, camZ);
-        }
-        if (distance < dl) {
+        
+        distance = linearDistance(-100*cos(mod_angle),-100*sin(mod_angle), 100*cos(mod_angle),100*sin(mod_angle), camX, camZ);
+        if (abs(mod_angle - est_angle)%TWO_PI > TWO_PI/10 && distance < dl) {
             dl = distance;
+            angle_value = dl;
         }
-        // dl = linearDistance(-100*cos(mod_angle),-100*sin(mod_angle), 100*cos(mod_angle),100*sin(mod_angle), camX, camZ);
     }
 
 
     let newVals = [camX, camZ];
     
-    if (dl < hallWidth && dr > roomRadius) {
-        space[0] = "hall";
-    } else if (dr < roomRadius && dl > hallWidth) {
+    if (dr < roomRadius) {
         space[0] = "room";
+    } else if (dl < hallWidth && dr > roomRadius) {
+        space[0] = "hall";
+
     }
-    if (space[0] == "hall") {
+    if (space[0] == "hall" && dl > hallWidth) {
         newVals = reduceLinearDistance(camX, camZ, hallWidth);
-        // camX = newVals[0];
-        // camZ = newVals[1];
+        camX = newVals[0];
+        camZ = newVals[1];
     }
     if (space[0] == "room" && dr > roomRadius) {
         newVals = reduceRadialDistance(camX, camZ, roomRadius);
@@ -350,29 +342,7 @@ function remainWithinBounds() {
     } 
 
 
-    // else if (space[0] == "hall") {
-    //     let newVals = reduceLinearDistance(camX, camZ, hallWidth);
-    //     camX = newVals[0];
-    //     camZ = newVals[1];
-    // }
-
-    // if (dr > roomRadius) { // if(in-a-room && distance-to-center > roomRadius && not(in-a-hall))
-    //     // space[0] = 
-        
-        
-    //     // distance-to-center = roomRadius;
-    // } else if (dl < hallWidth) {
-    //     // space[0] = "room";
-    // }
-
-    // if (dl > hallWidth) {
-
-    // }
-
-    //else if (true) { // if(in-a-hall && distance-to-center > hallWidth)
-        // distance-to-center = hallWidth;
-    // }
-    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>Radial distance: ${floor(dr*100)/100}</p><p>Linear Distance: ${floor(dl*100)/100}</p><p>${space[0]} ${space[1]}</p><p>testing</p>`
+    document.getElementsByClassName("innerDivText")[0].innerHTML = `<p>camX: ${floor(camX)}; camZ: ${floor(camZ)}</p><p>Radial distance: ${floor(dr*100)/100}</p><p>Linear Distance: ${floor(dl*100)/100}</p><p>${space[0]} ${space[1]}</p><p>Closest angle value: ${angle_value}</p>`
 }
 
 // movement with the mouse and on mobile
