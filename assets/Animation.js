@@ -349,7 +349,7 @@ function remainWithinBounds() {
 // movement with the mouse and on mobile
 function mouseDragged() {
     document.body.style.userSelect = "none"; 
-    if (touches.length === 0) { // mouse used on desktop
+    if (touches.length == 0) { // mouse used on desktop
         requestPointerLock();
         camPan -= movedX * touchSensitivity;
         camTilt += movedY * touchSensitivity;
@@ -358,7 +358,7 @@ function mouseDragged() {
         } else if (camTilt >= maxCamTilt) {
             camTilt = maxCamTilt;
         }
-    } else if (touches.length === 1) { // dragged with one finger on mobile
+    } else if (touches.length == 1) { // dragged with one finger on mobile
         if (previousTouch.length !== 0) {
             camPan += (touches[0].x - previousTouch.x) * touchSensitivity;
             camTilt -= (touches[0].y - previousTouch.y) * touchSensitivity;
@@ -369,7 +369,7 @@ function mouseDragged() {
             }
         }
         previousTouch = touches[0];
-    } else if (touches.length === 2) { // dragged with two fingers on mobile
+    } else if (touches.length == 2) { // dragged with two fingers on mobile
         let newPinchDistance = sqrt((touches[0].x - touches[1].x)**2 + (touches[0].y - touches[1].y)**2);
         if (((pinchDistance !== 0) && (abs(pinchDistance-newPinchDistance) >= 2)) && viewState !== "moving") { // Control of Zoom 
             camZ += zoomSensitivity*(pinchDistance - newPinchDistance) * Math.cos(camPan);
@@ -390,7 +390,7 @@ function mouseDragged() {
         pinchDistance = newPinchDistance;
     }
     // ensureOnlyFloor();
-    touchesNumber = touches.length;
+    touchesNumber = pinchDistance;
 }
 
 function mouseReleased() {
